@@ -3,5 +3,5 @@ package com.example.sportsprediction.feature_app.data.local.entities.user_profil
 
 data class Reaction(
     val likes: Int?,
-    val dislikes: Int?
+    val dislikes: Int?,
 )

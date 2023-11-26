@@ -3,6 +3,7 @@ package com.example.sportsprediction.feature_app.ui.presentation.composables.com
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -13,6 +14,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+
 
 @Composable
 fun BasicImage (
@@ -36,5 +38,20 @@ fun BasicImage (
                 .fillMaxSize()
         )
     }
+
+}
+
+@Composable
+fun IconImage (
+    drawableResource: Int,
+    modifier: Modifier
+    )
+{
+    Image(
+        painter = painterResource(id = drawableResource),
+        contentDescription = null,
+        modifier = modifier.aspectRatio(1f, matchHeightConstraintsFirst = true)
+    )
+
 
 }

@@ -2,137 +2,259 @@ package com.example.sportsprediction.feature_app.ui.presentation.composables.bui
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import com.example.sportsprediction.R
+import com.example.sportsprediction.core.util.Constants
 import com.example.sportsprediction.feature_app.data.local.entities.events.EventsEntity
-import com.example.sportsprediction.feature_app.ui.presentation.composables.components.BasicText
+import com.example.sportsprediction.feature_app.ui.presentation.composables.date_events.DateTimeView
 import com.example.sportsprediction.feature_app.ui.theme.*
 
 
-@OptIn(ExperimentalMaterial3Api::class)
+
+
+
 @Composable
 fun BuildBetCard(
-    country: String,
-    preferredEvents: List<EventsEntity>,
+    preferredEvent: EventsEntity,
     selectedEvents: MutableList<EventsEntity>,
-    expandedEvents:  Map<String, List<EventsEntity>>,
-    getIsSelected: (preferredEvents: List<EventsEntity>) -> Unit,
-    getIsExpanded: (isExpanded: Boolean, preferredEvents: Map<String,List<EventsEntity>>) -> Unit,
+    getSelectedEvents: (selectedEvents: MutableList<EventsEntity>) -> Unit,
 ) {
 
-    val theseSelectedEvents by remember { mutableStateOf(selectedEvents) }
+    var thisEventIsSelected by remember {
+        mutableStateOf(selectedEvents.contains(preferredEvent))
+    }
+    var thisSelectedEvents by remember {
+        mutableStateOf(selectedEvents)
+    }
+    LaunchedEffect(selectedEvents){
+        thisEventIsSelected = selectedEvents.contains(preferredEvent)
+        thisSelectedEvents = selectedEvents
+    }
 
-    var isSelected by remember { mutableStateOf(selectedEvents.containsAll(preferredEvents)) }
-    var isExpanded by remember { mutableStateOf(false) }
-    val expandedPreferredEvents by remember { mutableStateOf(expandedEvents.toMutableMap()) }
 
-    val contentColor = Color.Black
-    val containerColor = if(isSelected) Color.LightGray else Color.White
-    val cardElevation = if (isSelected) LocalSpacing.current.small else LocalSpacing.current.large
+    val roundName = preferredEvent.roundInfo?.name ?: Constants.emptyString
+    val roundNumber = preferredEvent.roundInfo?.round ?: Constants.nullInteger
+    val roundInfo = if (roundName.isEmpty() && roundNumber == Constants.nullInteger) {
+        Constants.emptyString
+    } else if (roundName.isNotEmpty() && roundNumber == Constants.nullInteger) {
+        ", $roundName"
+    } else if (roundName.isEmpty() && roundNumber != Constants.nullInteger) {
+        ", Round $roundNumber"
+    } else {
+        ", $roundName, Round $roundNumber"
+    }
+
+    val sport = if (preferredEvent.tournament?.sport.isNullOrBlank()) {
+        Constants.emptyString
+    } else preferredEvent.tournament?.sport
+    val tournamentName = if (preferredEvent.tournamentName.isNullOrBlank()) Constants.emptyString else {
+        ", ${preferredEvent.tournamentName}"
+    }
+    val country = if (preferredEvent.tournament?.categoryName.isNullOrBlank()) Constants.emptyString else {
+        ", ${preferredEvent.tournament?.categoryName}"
+    }
+
+    val backgroundColor = if (thisEventIsSelected){
+        MaterialTheme.colorScheme.surface
+    } else {
+        MaterialTheme.colorScheme.surfaceVariant
+    }
+    val contentColor = if (thisEventIsSelected){
+        MaterialTheme.colorScheme.onSurface
+    } else {
+        MaterialTheme.colorScheme.onSurfaceVariant
+    }
+
 
     Card(
         shape = MaterialTheme.shapes.large,
         colors = CardDefaults.cardColors(
             contentColor = contentColor,
-            containerColor = containerColor,
+            containerColor = backgroundColor,
         ),
         modifier = Modifier
             .fillMaxWidth()
-            .padding(LocalSpacing.current.small),
-        onClick = {
-            isSelected =! isSelected
-            if (isSelected) {
-                theseSelectedEvents.addAll(preferredEvents)
-                getIsSelected(theseSelectedEvents)
-            }else{
-                theseSelectedEvents.removeAll(preferredEvents)
-                getIsSelected(theseSelectedEvents)
-            }
-        },
-        elevation = CardDefaults.cardElevation(defaultElevation = cardElevation )
+            .padding(LocalSpacing.current.small)
+            .toggleable(value = thisEventIsSelected,
+                onValueChange = { isSelected ->
+                    thisSelectedEvents = thisSelectedEvents.toSet().toMutableList()
+                    if (thisSelectedEvents.contains(preferredEvent)){
+                        thisSelectedEvents.remove(preferredEvent)
+                    }
+                    else { thisSelectedEvents.add(preferredEvent) }
+                    thisSelectedEvents = thisSelectedEvents.toSet().toMutableList()
+                    getSelectedEvents(thisSelectedEvents)
+                    thisEventIsSelected = thisSelectedEvents.contains(preferredEvent)
+                }
+            ),
+        elevation = CardDefaults.cardElevation(defaultElevation = LocalSpacing.current.smallMedium)
     ) {
-        Row(modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Start
+        Row(
+            modifier = Modifier.padding(LocalSpacing.current.extraSmall),
+            horizontalArrangement = Arrangement.Start,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Box(modifier = Modifier
-                .width(LocalSpacing.current.topAppBarSize)
-                .height(LocalSpacing.current.topAppBarSize)
-                .padding(LocalSpacing.current.small),
+            Box(
+                modifier = Modifier.padding(LocalSpacing.current.extraSmall),
                 contentAlignment = Alignment.Center
-            ){
-                Image(modifier = Modifier.fillMaxSize(),
-                    painter = painterResource(id = R.drawable.flag),
-                    contentDescription = "",
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.football),
+                    contentDescription = Constants.emptyString,
+                    tint = MaterialTheme.colorScheme.primary
                 )
             }
-
-            Box(modifier = Modifier
-                .weight(1f)
-                .height(LocalSpacing.current.extraLarge)
-                .padding(LocalSpacing.current.small),
-                contentAlignment = Alignment.CenterStart
-            ){
-                BasicText(text = country, fontSize = 16.sp, textColor = Color.Black)
-            }
-
-            Box(modifier = Modifier
-                .wrapContentWidth()
-                .wrapContentHeight()
-                .padding(LocalSpacing.current.small),
+            Box(
+                modifier = Modifier.padding(LocalSpacing.current.extraSmall),
                 contentAlignment = Alignment.Center
-            ){
-                BasicText(text = "${preferredEvents.size}", fontSize = 16.sp, textColor = contentColor)
+            ) {
+                Text(
+                    text = "$sport$country$tournamentName$roundInfo",
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = FontWeight.SemiBold,
+                    textAlign = TextAlign.Start,
+                    color = contentColor,
+                    overflow = TextOverflow.Ellipsis
+                )
             }
+        }
 
-            if (!isSelected) {
-                Box(modifier = Modifier
-                    .width(LocalSpacing.current.large)
-                    .height(LocalSpacing.current.large)
-                    .padding(LocalSpacing.current.small)
-                    .clickable(
-                        enabled = true,
-                        onClick = {
-                            isExpanded = !isExpanded
-
-                            expandedPreferredEvents[country] = preferredEvents
-
-                            getIsExpanded(isExpanded, expandedPreferredEvents)
-
-                        }
-                    ),
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = LocalSpacing.current.small)
+        ) {
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(start = LocalSpacing.current.extraSmall)
+                    .background(Color.Transparent)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = LocalSpacing.current.noPadding)
+                        .background(Color.Transparent),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         modifier = Modifier
-                            .fillMaxSize()
-                            .border(
-                                width = LocalSpacing.current.extraSmall,
-                                color = PrimaryThemeColor,
-                                shape = CircleShape
-                            ),
-                        imageVector = if (isExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
-                        contentDescription = "",
-                        tint = PrimaryThemeColor
+                            .padding(LocalSpacing.current.extraSmall)
+                            .requiredHeight(LocalSpacing.current.large)
+                            .requiredWidth(LocalSpacing.current.large)
+                            .aspectRatio(1f.div(1f))
+                            .background(
+                                MaterialTheme.colorScheme.primary,
+                                shape = MaterialTheme.shapes.medium
+                            )
+                            .clip(CircleShape),
+                        tint = MaterialTheme.colorScheme.onPrimary,
+                        painter = painterResource(id = R.drawable.home),
+                        contentDescription = Constants.emptyString
                     )
+                }
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = LocalSpacing.current.small),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = preferredEvent.homeTeamName ?: Constants.emptyString,
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        color = contentColor,
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = 1,
+                        textAlign = TextAlign.Start
+                    )
+                }
+
+            }
+
+            Box(
+                modifier = Modifier
+                    .weight(1f), contentAlignment = Alignment.Center
+            ) {
+                preferredEvent.date?.let {
+                    preferredEvent.startTimestamp?.let { startTimestamp ->
+                        DateTimeView(
+                            startTimestamp = startTimestamp.toLong()
+                        )
+                    }
                 }
             }
 
-            Spacer(modifier = Modifier.width(LocalSpacing.current.small))
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(start = LocalSpacing.current.extraSmall)
+                    .background(Color.Transparent)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(end = LocalSpacing.current.noPadding)
+                        .background(Color.Transparent, shape = MaterialTheme.shapes.large),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        modifier = Modifier
+                            .padding(LocalSpacing.current.extraSmall)
+                            .requiredHeight(LocalSpacing.current.large)
+                            .requiredWidth(LocalSpacing.current.large)
+                            .aspectRatio(1f.div(1f))
+                            .background(
+                                MaterialTheme.colorScheme.tertiary,
+                                shape = MaterialTheme.shapes.medium
+                            )
+                            .clip(CircleShape),
+                        tint = MaterialTheme.colorScheme.onTertiary,
+                        painter = painterResource(id = R.drawable.away),
+                        contentDescription = Constants.emptyString
+                    )
+                }
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(end = LocalSpacing.current.small),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = preferredEvent.awayTeamName ?: Constants.emptyString,
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        color = contentColor,
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = 1,
+                        textAlign = TextAlign.Center
+                    )
+                }
 
+            }
 
         }
+
     }
 
 }
+
+
+
+
+
+
+
+

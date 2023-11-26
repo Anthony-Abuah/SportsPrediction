@@ -21,6 +21,11 @@ object SuggestionVariables {
     var WinOrLose = "12"
     var DrawOrLose = "X2"
 
+    var Win_Or_Draw = "win or draw"
+    var Win_Or_Lose = "win or lose"
+    var Draw_Or_Lose = "draw or lose"
+
+
 
 
     var pointFive = ".5"

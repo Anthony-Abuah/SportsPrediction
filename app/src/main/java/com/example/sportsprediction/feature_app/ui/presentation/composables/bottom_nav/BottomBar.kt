@@ -1,17 +1,16 @@
 package com.example.sportsprediction.feature_app.ui.presentation.composables.bottom_nav
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.BottomNavigation
+import androidx.compose.material3.Divider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.sportsprediction.feature_app.ui.theme.LocalSpacing
-import com.example.sportsprediction.feature_app.ui.theme.PrimaryThemeColor
 
 @Composable
 fun BottomBar(
@@ -28,22 +27,33 @@ fun BottomBar(
 
     BottomNavigation(modifier = Modifier
         .height(LocalSpacing.current.bottomNavBarSize)
-        .background(Color.White)
         .fillMaxWidth(),
-        backgroundColor = PrimaryThemeColor,
+        backgroundColor = MaterialTheme.colorScheme.surfaceVariant,
+        contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
         elevation = LocalSpacing.current.medium
     ) {
-        Row(modifier = Modifier
-            .fillMaxSize(),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
+        Column(modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            screens.forEach{screen->
-                AddItem(
-                    screen = screen,
-                    currentDestination = currentDestination,
-                    navController = navHostController
-                )
+            Divider(
+                modifier = Modifier.fillMaxWidth(),
+                thickness = LocalSpacing.current.borderStroke,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Row(
+                modifier = Modifier
+                    .fillMaxSize(),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                screens.forEach { screen ->
+                    AddItem(
+                        screen = screen,
+                        currentDestination = currentDestination,
+                        navController = navHostController
+                    )
+                }
             }
         }
 

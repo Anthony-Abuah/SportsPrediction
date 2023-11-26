@@ -1,11 +1,12 @@
 package com.example.sportsprediction.feature_app.data.local.entities.tipster.data_classes
 
+import java.util.Date
 
 
 data class Rating(
-    val overAllUserRating: Double?,
-    val overAllAppRating: Double?,
-    val currentUserRating: Double?,
-    val currentAppRating: Double?,
+    val uniqueUserId: String?,
+    val uniqueTipsterId: String?,
+    val ratingDate: Date?,
+    val userRating: Double?
 
 )

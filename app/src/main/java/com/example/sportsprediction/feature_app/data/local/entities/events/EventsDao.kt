@@ -33,7 +33,7 @@ interface EventsDao {
     suspend fun getEventIdForOdds(homeTeamId: Int, awayTeamId: Int, eventId: Int): Int?
 
     @Query ("SELECT * FROM $Events_Entity WHERE date LIKE :date")
-    suspend fun getThisDateEventsOrderedByAscendingStartTime(date: Date): List<EventsEntity>?
+    suspend fun getThisDateEvents(date: Date): List<EventsEntity>?
 
     @Query ("SELECT * FROM $Events_Entity WHERE eventId LIKE :eventId")
     fun getEvent(eventId: Int): Flow<EventsEntity>?
@@ -48,10 +48,10 @@ interface EventsDao {
     suspend fun getDates(): List<Date>?
 
     @Query ("SELECT * FROM $Events_Entity WHERE date LIKE :date AND tournamentName LIKE :tournamentName")
-    suspend fun getThisDateEventsOrderedByAscendingStartTime(date: Date, tournamentName: String): List<EventsEntity>?
+    suspend fun getThisDateEvents(date: Date, tournamentName: String): List<EventsEntity>?
 
     @Query ("SELECT * FROM $Events_Entity WHERE date LIKE :date AND tournamentId LIKE :tournamentId")
-    suspend fun getThisDateEventsOrderedByAscendingStartTime(date: Date, tournamentId: Int): List<EventsEntity>?
+    suspend fun getThisDateEvents(date: Date, tournamentId: Int): List<EventsEntity>?
 
     @Query ("SELECT * FROM $Events_Entity WHERE date LIKE :date AND homeTeamName LIKE :teamName OR awayTeamName LIKE :teamName")
     suspend fun getTeamEvent(date: Date, teamName: String): List<EventsEntity>?

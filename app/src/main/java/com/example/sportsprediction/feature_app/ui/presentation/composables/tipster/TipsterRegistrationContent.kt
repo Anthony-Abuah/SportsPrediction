@@ -231,7 +231,9 @@ fun TipsterRegistrationContent(
             .padding(LocalSpacing.current.large),
             contentAlignment = Alignment.Center
         ) {
-            RegisterTipsterButton(buttonName = "Register") {
+            RegisterTipsterButton(buttonName = "Register",
+            isLoading = false
+            ) {
                 getUser(username, userPassword)
                 val localDateNow = LocalDate.now()
                 val currentDate = localDateNow.toDate()
@@ -241,7 +243,7 @@ fun TipsterRegistrationContent(
                 else {
                     val tipster = TipsterEntity(
                         null,
-                        user = user,
+                        uniqueUserId = "user",
                         bankAccount = null,
                         tipsterName = tipsterName,
                         tipsterPassword = newPassword,
@@ -250,10 +252,12 @@ fun TipsterRegistrationContent(
                         subscribers = null,
                         paidSubscribers = null,
                         posts = null,
-                        rating = null,
+                        ratings = null,
                         tips = null,
                         reviews = null,
                         packages = null,
+                        monthlyRatings = null,
+                        uniqueTipsterId = null,
                         isVerified = false
                     )
                     registerTipster(tipster)

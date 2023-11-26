@@ -16,7 +16,7 @@ interface TeamEventRepository {
 
     suspend fun getTeamNameFormPercentage(teamId: Int, headToHeadEventId: String): Double
 
-    suspend fun getTeamFormPercentage(teamId: Int): Double
+    suspend fun getTeamFormPercentage(teamId: Int): Flow<Resource<Double>>
 
     suspend fun getOpponentFormMultiplierValue(teamId: Int, headToHeadEventId: String): Double
 

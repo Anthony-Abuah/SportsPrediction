@@ -4,6 +4,7 @@ import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.sportsprediction.feature_app.ui.presentation.composables.components.PredictionsScreenTopBar
+import com.example.sportsprediction.feature_app.ui.presentation.composables.components.UserPreferencesTopBar
 import com.example.sportsprediction.feature_app.ui.presentation.composables.tipster.TipsterRegistrationContent
 import com.example.sportsprediction.feature_app.ui.presentation.view_model.TipsterViewModel
 import com.example.sportsprediction.feature_app.ui.presentation.view_model.UserProfileViewModel
@@ -17,7 +18,7 @@ fun RegisterTipstersScreen(
 ){
     Scaffold(
         topBar = {
-            PredictionsScreenTopBar(label = "Tipster Registration") {
+            UserPreferencesTopBar {
                 navigateBack()
             }
         },

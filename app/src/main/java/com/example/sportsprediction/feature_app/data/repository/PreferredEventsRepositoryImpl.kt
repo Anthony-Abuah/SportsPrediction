@@ -23,15 +23,15 @@ class PreferredEventsRepositoryImpl(
     }
 
     override suspend fun getPreferredEvents(date: Date, tournamentId: Int): ListOfEvents? {
-        return eventsDao.getThisDateEventsOrderedByAscendingStartTime(date, tournamentId)
+        return eventsDao.getThisDateEvents(date, tournamentId)
     }
 
     override suspend fun getPreferredEvents(date: Date, tournamentName: String): ListOfEvents? {
-        return eventsDao.getThisDateEventsOrderedByAscendingStartTime(date, tournamentName)
+        return eventsDao.getThisDateEvents(date, tournamentName)
     }
 
     override suspend fun getPreferredEvents(date: Date): ListOfEvents? {
-        return  eventsDao.getThisDateEventsOrderedByAscendingStartTime(date)
+        return  eventsDao.getThisDateEvents(date)
     }
 
     override suspend fun getPreferredEvent(eventId: Int): Flow<EventsEntity>? {

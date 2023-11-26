@@ -29,6 +29,11 @@ fun EditTextUserPreferenceCard(
 ) {
     var openAlertDialog by mutableStateOf(false)
 
+    val isDarkTheme by mutableStateOf(false)
+    val backgroundColor = if(isDarkTheme) Color.White else Color.White
+    val primaryPreferenceColor = if(isDarkTheme) Color.Black else Color.Black
+    val secondaryPreferenceColor = if(isDarkTheme) Color.Gray else Color.Gray
+
     Card(
         shape = MaterialTheme.shapes.small,
         colors = CardDefaults.cardColors(
@@ -66,7 +71,7 @@ fun EditTextUserPreferenceCard(
                     .padding(LocalSpacing.current.noPadding),
                     contentAlignment = Alignment.CenterStart
                 ){
-                    UserPreferenceMainText(text = userPreference)
+                    UserPreferenceMainText(text = userPreference, color = primaryPreferenceColor)
                 }
 
                 Box(modifier = Modifier
@@ -74,7 +79,7 @@ fun EditTextUserPreferenceCard(
                     .padding(LocalSpacing.current.noPadding),
                     contentAlignment = Alignment.CenterStart
                 ){
-                    UserPreferenceValueText(text = displayValue)
+                    UserPreferenceValueText(text = displayValue, color = secondaryPreferenceColor)
                 }
             }
 

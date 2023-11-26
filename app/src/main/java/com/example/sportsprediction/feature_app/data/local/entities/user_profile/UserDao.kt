@@ -20,8 +20,8 @@ interface UserDao {
     @Query ("SELECT * FROM $User_Entity")
     suspend fun getAllUsers(): Users?
 
-    @Query ("SELECT * FROM $User_Entity WHERE userName LIKE :userName AND password LIKE :password")
-    suspend fun getUser(userName: String, password: String): UserEntity?
+    @Query ("SELECT * FROM $User_Entity WHERE userName LIKE :userName AND email LIKE :email")
+    suspend fun getUser(userName: String, email: String): UserEntity?
 
     @Query ("SELECT email FROM $User_Entity")
     suspend fun getUserEmails(): List<String>?
@@ -29,8 +29,7 @@ interface UserDao {
     @Query ("SELECT userName FROM $User_Entity")
     suspend fun getUserNames(): List<String>?
 
-    @Query ("SELECT password FROM $User_Entity")
-    suspend fun getUserPasswords(): List<String>?
+
 
 
 

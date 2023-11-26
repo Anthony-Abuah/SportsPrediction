@@ -5,6 +5,7 @@ import com.example.sportsprediction.feature_app.data.local.AppDatabase
 import com.example.sportsprediction.feature_app.data.remote.SportsPredictionApi
 import com.example.sportsprediction.feature_app.data.repository.*
 import com.example.sportsprediction.feature_app.domain.repository.*
+import com.google.firebase.auth.FirebaseAuth
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -99,6 +100,25 @@ object RepositoryModule {
         db: AppDatabase,
     ): TipsterRepository {
         return TipsterRepositoryImpl(db.tipsterDao, db.userDao)
+    }
+
+
+    @Provides
+    @Singleton
+    fun provideAuthRepository(
+        firebaseAuth: FirebaseAuth
+    ): AuthRepository {
+        return AuthRepositoryImpl(firebaseAuth)
+    }
+
+    @Provides
+    @Singleton
+    fun provideLoadSuggestionsRepository(
+        db: AppDatabase
+    ): LoadSuggestionsRepository {
+        return LoadSuggestionsRepositoryImpl(
+            db.eventStatsDao
+        )
     }
 
 

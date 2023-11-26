@@ -1,16 +1,21 @@
 package com.example.sportsprediction.feature_app.ui.presentation.composables.components
 
 
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
-import com.example.sportsprediction.feature_app.ui.theme.TeamEmblemColor
+import com.example.sportsprediction.feature_app.ui.theme.Blue10
+import com.example.sportsprediction.feature_app.ui.theme.Blue90
+import com.example.sportsprediction.feature_app.ui.theme.BlueGrey90
+import com.example.sportsprediction.feature_app.ui.theme.Grey90
+
 
 @Composable
 fun BasicText(
@@ -28,17 +33,44 @@ fun BasicText(
 }
 
 @Composable
-fun EventScoresInfoText(
+fun SuggestionFilterCardText(
+    text: String
+) {
+    Text(
+        text = text,
+        fontWeight= FontWeight.SemiBold,
+        color = MaterialTheme.colorScheme.onBackground,
+        style = MaterialTheme.typography.labelLarge
+
+    )
+}
+@Composable
+fun SuggestionFilterCardValueText(
+    text: String
+) {
+    Text(
+        text = text,
+        fontWeight= FontWeight.Normal,
+        color = MaterialTheme.colorScheme.onSurface,
+        style = MaterialTheme.typography.labelLarge,
+        overflow = TextOverflow.Ellipsis
+
+    )
+}
+
+@Composable
+fun EventScoresTeamText(
     text: String,
-    textColor: Color,
     fontWeight: FontWeight
 ) {
     Text(
         text = text,
         fontWeight= fontWeight,
-        color = textColor,
-        fontSize = 16.sp,
-        textAlign = TextAlign.Start
+        color = MaterialTheme.colorScheme.onBackground,
+        style = MaterialTheme.typography.bodyMedium,
+        textAlign = TextAlign.Start,
+        overflow = TextOverflow.Ellipsis,
+        maxLines = 1
     )
 }
 
@@ -92,8 +124,7 @@ fun SelectLeagueText(
     Text(
         text = text,
         fontWeight= FontWeight.Bold,
-        color = Color.Black,
-        fontSize = 16.sp,
+        style = MaterialTheme.typography.titleMedium,
         textAlign = TextAlign.Center
     )
 }
@@ -105,8 +136,7 @@ fun StartTimeFilterText(
     Text(
         text = text,
         fontWeight= FontWeight.SemiBold,
-        color = Color.Black,
-        fontSize = 16.sp,
+        style = MaterialTheme.typography.titleMedium,
         textAlign = TextAlign.Center
     )
 }
@@ -118,8 +148,8 @@ fun BetSlipSuggestionText(
     Text(
         text = text,
         fontWeight= FontWeight.Normal,
-        color = Color.Black,
-        fontSize = 15.sp,
+        color = MaterialTheme.colorScheme.onBackground,
+        style = MaterialTheme.typography.labelMedium,
         textAlign = TextAlign.Center
     )
 }
@@ -131,8 +161,8 @@ fun BetSlipLightStreakText(
     Text(
         text = text,
         fontWeight= FontWeight.Normal,
-        color = Color.Gray,
-        fontSize = 14.sp,
+        color = MaterialTheme.colorScheme.onBackground,
+        style = MaterialTheme.typography.labelMedium,
         textAlign = TextAlign.Center
     )
 }
@@ -145,36 +175,8 @@ fun BetSlipBoldStreakText(
     Text(
         text = text,
         fontWeight= FontWeight.Bold,
-        color = Color.Black,
-        fontSize = 14.sp,
-        textAlign = TextAlign.Center
-    )
-}
-
-@Composable
-fun PlaceholderText(
-    text: String,
-) {
-    Text(
-        text = text,
-        fontWeight= FontWeight.Normal,
-        color = Color.Gray,
-        fontSize = 16.sp,
-        textAlign = TextAlign.Center
-    )
-}
-
-@Composable
-fun BasicSemiBoldText(
-    text: String,
-    fontSize: TextUnit,
-    textColor: Color
-) {
-    Text(
-        text = text,
-        fontWeight= FontWeight.SemiBold,
-        color = textColor,
-        fontSize = fontSize,
+        color = MaterialTheme.colorScheme.onBackground,
+        style = MaterialTheme.typography.labelMedium,
         textAlign = TextAlign.Center
     )
 }
@@ -185,9 +187,9 @@ fun OddsNameText(
 ) {
     Text(
         text = text,
-        fontWeight= FontWeight.SemiBold,
-        color = Color.LightGray,
-        fontSize = 13.sp,
+        fontWeight= FontWeight.Normal,
+        color = MaterialTheme.colorScheme.outline,
+        style = MaterialTheme.typography.labelMedium,
         textAlign = TextAlign.Center
     )
 }
@@ -198,9 +200,9 @@ fun OddsDisplayText(
 ) {
     Text(
         text = text,
-        fontWeight= FontWeight.SemiBold,
-        color = Color.Black,
-        fontSize = 15.sp,
+        fontWeight= FontWeight.Bold,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        style = MaterialTheme.typography.bodyLarge,
         textAlign = TextAlign.Center
     )
 }
@@ -240,9 +242,12 @@ fun TeamEmblemText(
     Text(
         text = text,
         fontWeight= FontWeight.SemiBold,
-        color = Color.Black,
-        fontSize = 12.sp,
-        textAlign = TextAlign.Center
+        color = BlueGrey90,
+        style = MaterialTheme.typography.labelLarge,
+        //fontSize = 12.sp,
+        textAlign = TextAlign.Center,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis
     )
 }
 
@@ -267,7 +272,7 @@ fun EventTeamTimeText(
     Text(
         text = text,
         fontWeight= FontWeight.Bold,
-        color = Color.Gray,
+        color = MaterialTheme.colorScheme.onTertiary,
         fontSize = 14.sp,
         textAlign = TextAlign.Center
     )
@@ -287,18 +292,6 @@ fun EventTeamTournamentText(
 }
 
 
-@Composable
-fun FormGuideText(
-    text: String
-) {
-    Text(
-        text = text,
-        fontWeight= FontWeight.SemiBold,
-        color = TeamEmblemColor,
-        fontSize = 12.sp,
-        textAlign = TextAlign.Center
-    )
-}
 
 @Composable
 fun TeamPastEventText(
@@ -307,8 +300,9 @@ fun TeamPastEventText(
     Text(
         text = text,
         fontWeight= FontWeight.SemiBold,
-        color = Color.Black,
-        fontSize = 16.sp,
+        color = MaterialTheme.colorScheme.onBackground,
+        style = MaterialTheme.typography.titleMedium,
+        //fontSize = 16.sp,
         textAlign = TextAlign.Center
     )
 }
@@ -321,50 +315,27 @@ fun FormGuideTeamNameText(
     Text(
         text = text,
         fontWeight= FontWeight.SemiBold,
-        color = Color.Gray,
-        fontSize = 8.sp,
+        color = MaterialTheme.colorScheme.onSecondaryContainer,
+        style = MaterialTheme.typography.labelSmall,
+        overflow = TextOverflow.Ellipsis,
         textAlign = TextAlign.Center
     )
 }
 
 @Composable
-fun DateMatchDurationText(
+fun FormCardHeaderText(
     text: String
 ) {
     Text(
         text = text,
         fontWeight= FontWeight.SemiBold,
-        color = Color.Black,
-        fontSize = 16.sp,
+        color = MaterialTheme.colorScheme.onSecondaryContainer,
+        style = MaterialTheme.typography.bodySmall,
         textAlign = TextAlign.Center
     )
 }
 
-@Composable
-fun FormGuideTitleText(
-    text: String
-) {
-    Text(
-        text = text,
-        fontWeight= FontWeight.Bold,
-        color = Color.Gray,
-        fontSize = 13.sp,
-        textAlign = TextAlign.Center
-    )
-}
 
-@Composable
-fun FormGuideRemarksText(
-    text: String
-) {
-    Text(
-        text = text,
-        fontWeight= FontWeight.ExtraBold,
-        color = Color.White,
-        fontSize = 12.sp,
-        textAlign = TextAlign.Center
-    )
-}
 
 @Composable
 fun DateEventTeamNameText(
@@ -382,28 +353,33 @@ fun DateEventTeamNameText(
 
 @Composable
 fun UserPreferenceMainText(
-    text: String
+    text: String,
+    color: Color
 ) {
     Text(
         text = text,
         fontWeight= FontWeight.Normal,
-        color = Color.Black,
+        color = color,
         fontSize = 16.sp,
-        textAlign = TextAlign.Center
+        textAlign = TextAlign.Start,
+        overflow = TextOverflow.Ellipsis,
+        maxLines = 1
     )
 }
 
 
 @Composable
 fun UserPreferenceValueText(
-    text: String
+    text: String,
+    color: Color,
 ) {
     Text(
         text = text,
         fontWeight= FontWeight.Normal,
-        color = Color.Gray,
+        color = color,
         fontSize = 14.sp,
-        textAlign = TextAlign.Center
+        textAlign = TextAlign.Center,
+        maxLines = 1
     )
 }
 
@@ -451,22 +427,6 @@ fun UnselectedTabText(
 }
 
 
-@Composable
-fun FilterText(
-    text: String,
-) {
-    Text(
-        text = text,
-        fontWeight= FontWeight.Normal,
-        color = Color.Blue,
-        fontSize = 16.sp,
-        textAlign = TextAlign.Center,
-        fontStyle = FontStyle.Italic,
-        textDecoration = TextDecoration.Underline
-
-    )
-}
-
 
 @Composable
 fun SuggestionPercentageText(
@@ -498,15 +458,14 @@ fun FilterDisplayText(
 
 
 @Composable
-fun FilterDisplayText1(
+fun TeamInformationText(
     text: String,
 ) {
     Text(
         text = text,
-        fontWeight= FontWeight.Normal,
-        color = Color.Gray,
-        fontSize = 15.sp,
-        textAlign = TextAlign.Center
+        color = MaterialTheme.colorScheme.onBackground,
+        style = MaterialTheme.typography.bodyMedium,
+        fontWeight = FontWeight.SemiBold
     )
 }
 

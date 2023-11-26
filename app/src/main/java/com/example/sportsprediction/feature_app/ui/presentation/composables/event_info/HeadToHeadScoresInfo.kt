@@ -2,8 +2,8 @@ package com.example.sportsprediction.feature_app.ui.presentation.composables.eve
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.Composable
@@ -12,9 +12,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.example.sportsprediction.core.util.Constants
 import com.example.sportsprediction.core.util.Constants.nullDouble
-import com.example.sportsprediction.feature_app.ui.presentation.composables.components.EventScoresInfoText
+import com.example.sportsprediction.feature_app.ui.presentation.composables.components.EventScoresTeamText
 import com.example.sportsprediction.feature_app.ui.theme.LocalSpacing
 
 @Composable
@@ -36,8 +35,6 @@ fun HeadToHeadScoresInfo(
         nullDouble
     }
 
-    val homeTextColor = if((thisHomeScore != nullDouble || thisAwayScore != nullDouble) && (thisHomeScore >= thisAwayScore)) Color.Black else Color.Gray
-    val awayTextColor = if((thisHomeScore != nullDouble || thisAwayScore != nullDouble) && (thisAwayScore >= thisHomeScore)) Color.Black else Color.Gray
     val homeFontWeight = if((thisHomeScore != nullDouble || thisAwayScore != nullDouble) && (thisHomeScore > thisAwayScore)) FontWeight.SemiBold else FontWeight.Normal
     val awayFontWeight = if((thisHomeScore != nullDouble || thisAwayScore != nullDouble) && (thisAwayScore > thisHomeScore)) FontWeight.SemiBold else FontWeight.Normal
 
@@ -45,13 +42,13 @@ fun HeadToHeadScoresInfo(
     Card(
         shape = MaterialTheme.shapes.small,
         colors = CardDefaults.cardColors(
-            contentColor = Color.Black,
-            containerColor = Color.Transparent,
+            contentColor = MaterialTheme.colorScheme.onBackground,
+            containerColor = MaterialTheme.colorScheme.background,
         ),
         modifier = Modifier
             .fillMaxWidth()
             .padding(LocalSpacing.current.small),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = LocalSpacing.current.noElevation)
     ) {
 
         Row(modifier = Modifier.fillMaxWidth(),
@@ -66,19 +63,24 @@ fun HeadToHeadScoresInfo(
                 // Date
                 Box(modifier = Modifier.padding(LocalSpacing.current.noPadding),
                     contentAlignment = Alignment.Center){
-                    Text(text = date, style = MaterialTheme.typography.subtitle2)
+                    Text(
+                        text = date,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        style = MaterialTheme.typography.labelSmall
+                    )
                 }
 
+                // Vertical Border
                 Box(modifier = Modifier
                     .padding(start = LocalSpacing.current.small, end = LocalSpacing.current.small)
-                    .fillMaxHeight()
+                    .fillMaxHeight(0.95f)
                     .width(LocalSpacing.current.borderStroke)
-                    .background(Color.LightGray),
+                    .background(MaterialTheme.colorScheme.onBackground),
                     contentAlignment = Alignment.Center
                 ){
                     Text(modifier = Modifier.padding(LocalSpacing.current.textSpace),
                         text = homeTeam.take(2),
-                        style = MaterialTheme.typography.subtitle1
+                        style = MaterialTheme.typography.bodySmall
                     )
                 }
 
@@ -92,7 +94,7 @@ fun HeadToHeadScoresInfo(
                             modifier = Modifier.padding(LocalSpacing.current.noPadding),
                             contentAlignment = Alignment.CenterStart
                         ) {
-                            EventScoresInfoText(text = homeTeam, textColor = homeTextColor, fontWeight = homeFontWeight)
+                            EventScoresTeamText(text = homeTeam, fontWeight = homeFontWeight)
                         }
                     }
 
@@ -103,7 +105,7 @@ fun HeadToHeadScoresInfo(
                         Box(modifier = Modifier.padding(LocalSpacing.current.noPadding),
                             contentAlignment = Alignment.CenterStart
                         ){
-                            EventScoresInfoText(text = awayTeam, textColor = awayTextColor, fontWeight = awayFontWeight)
+                            EventScoresTeamText(text = awayTeam, fontWeight = awayFontWeight)
                         }
 
                     }
@@ -129,7 +131,7 @@ fun HeadToHeadScoresInfo(
                             modifier = Modifier.padding(LocalSpacing.current.noPadding),
                             contentAlignment = Alignment.CenterStart
                         ) {
-                            EventScoresInfoText(text = homeScore, textColor = Color.Black, fontWeight = FontWeight.Normal)
+                            EventScoresTeamText(text = homeScore, fontWeight = homeFontWeight)
                         }
                     }
 
@@ -141,7 +143,7 @@ fun HeadToHeadScoresInfo(
                             modifier = Modifier.padding(LocalSpacing.current.noPadding),
                             contentAlignment = Alignment.CenterStart
                         ) {
-                            EventScoresInfoText(text = awayScore, textColor = Color.Black, fontWeight = FontWeight.Normal)
+                            EventScoresTeamText(text = awayScore, fontWeight = awayFontWeight)
                         }
 
                     }
@@ -150,6 +152,7 @@ fun HeadToHeadScoresInfo(
             }
 
         }
+
     }
 
 }

@@ -556,8 +556,23 @@ class Converters(
             object : TypeToken<UserSubscription>(){}.type
         ) ?: "[]"
     }
+// Subscribers Converter
+    @TypeConverter
+    fun fromUserSubscriptionsJson(userSubscriptions: String): UserSubscriptions {
+        return jsonParser.fromJson<UserSubscriptions>(
+            userSubscriptions,
+            object : TypeToken<UserSubscription>(){}.type) ?: emptyList()
+    }
 
-    // Subscribers Converter
+    @TypeConverter
+    fun toUserSubscriptionsJson(userSubscriptions: UserSubscriptions): String{
+        return jsonParser.toJson(
+            userSubscriptions,
+            object : TypeToken<UserSubscriptions>(){}.type
+        ) ?: "[]"
+    }
+
+    // Ratings Converter
     @TypeConverter
     fun fromRatingJson(rating: String): Rating {
         return jsonParser.fromJson<Rating>(
@@ -573,12 +588,29 @@ class Converters(
         ) ?: "[]"
     }
 
+
+    // Ratings Converter
+    @TypeConverter
+    fun fromRatingsJson(ratings: String): Ratings {
+        return jsonParser.fromJson<Ratings>(
+            ratings,
+            object : TypeToken<Ratings>(){}.type) ?: emptyList()
+    }
+
+    @TypeConverter
+    fun toRatingsJson(ratings: Ratings): String{
+        return jsonParser.toJson(
+            ratings,
+            object : TypeToken<Ratings>(){}.type
+        ) ?: "[]"
+    }
+
     // Subscribers Converter
     @TypeConverter
     fun fromUserEntityJson(userEntity: String): UserEntity {
         return jsonParser.fromJson<UserEntity>(
             userEntity,
-            object : TypeToken<UserEntity>(){}.type) ?: UserEntity(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null)
+            object : TypeToken<UserEntity>(){}.type) ?: UserEntity(null,null,null, null, null, null, null, null, null, null, null, null, null, null, null, null)
     }
 
     @TypeConverter

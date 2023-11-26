@@ -4,11 +4,14 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -25,8 +28,7 @@ fun RowScope.AddItem(
     navController: NavHostController
 ) {
     val isSelected = currentDestination?.hierarchy?.any { it.route == screen.route } == true
-    val backgroundColor = if (isSelected) PrimaryThemeColor else Color.Transparent
-    val contentColor = if (isSelected) Color.White else SecondaryBackgroundColor
+    val contentColor = MaterialTheme.colorScheme.primary
 
     Box(modifier = Modifier
         .fillMaxHeight()
@@ -53,12 +55,16 @@ fun RowScope.AddItem(
                     tint = contentColor
                 )
 
-                BasicText(text = screen.name, fontSize = 14.sp, textColor = contentColor)
+                Text(text = screen.name,
+                    color = contentColor,
+                    fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Light,
+                    fontSize = 14.sp
+                )
 
                 Spacer(
                     modifier = Modifier
                         .fillMaxWidth(1f)
-                        .background(if (isSelected) Color.White else Color.Transparent)
+                        .background(if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent)
                         .height(LocalSpacing.current.small)
                 )
 

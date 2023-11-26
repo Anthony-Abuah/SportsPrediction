@@ -11,48 +11,30 @@ import kotlinx.coroutines.flow.flow
 class UserProfileRepositoryImpl(
     private val userDao: UserDao
 ): UserProfileRepository {
-    override fun registerUser(user: UserEntity): Flow<Resource<String>> = flow {
-
-        val allUserNames = userDao.getUserNames() ?: emptyList()
-        val allPasswords = userDao.getUserPasswords() ?: emptyList()
-        val userName = user.userName ?: DoesNotExist.toString()
-        val userPassword = user.password ?: DoesNotExist.toString()
-
-        if (allUserNames.contains(userName)){
-            emit(Resource.Error("Username already exists", "Please use a different userName"))
-        }
-        else if (allPasswords.contains(userPassword)){
-            emit(Resource.Error("Password has already been used", "Please use a different password"))
-        }
-        else{
-            userDao.insertUser(user)
-            emit(Resource.Success("Successfully Registered"))
-        }
-
+    override fun insertUser(user: UserEntity): Flow<Resource<String>> = flow {
+        emit(Resource.Loading())
+        userDao.insertUser(user)
+        emit(Resource.Success("User info successfully added"))
     }
 
-    override fun loginUser(username: String, password: String): Flow<Resource<String>> = flow {
+    override fun loginUser(username: String, email: String): Flow<Resource<String>> = flow {
 
         val allUserNames = userDao.getUserNames() ?: emptyList()
-        val allPasswords = userDao.getUserPasswords() ?: emptyList()
-        val user = userDao.getUser(username, password)
+        val user = userDao.getUser(username, email)
         val userName = user?.userName ?: DoesNotExist.toString()
-        val userPassword = user?.password ?: DoesNotExist.toString()
 
         if (!allUserNames.contains(userName)){
             emit(Resource.Error("$username is not registered", "Please register and  log in"))
         }
-        else if (!allPasswords.contains(userPassword)){
-            emit(Resource.Error("Incorrect password", "Please try again"))
-        }
+
         else if (user == null){
             emit(Resource.Error("User does not exist", "Please check credentials or register again"))
         }
         else emit(Resource.Success("Successfully Logged in"))
         }
 
-    override suspend fun getUser(username: String, password: String): UserEntity? {
-        return userDao.getUser(username, password)
+    override suspend fun getUser(username: String, email: String): UserEntity? {
+        return userDao.getUser(username, email)
     }
 
 

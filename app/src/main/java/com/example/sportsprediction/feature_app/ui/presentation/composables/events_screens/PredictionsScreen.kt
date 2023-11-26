@@ -1,21 +1,25 @@
 package com.example.sportsprediction.feature_app.ui.presentation.composables.events_screens
 
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.pager.rememberPagerState
+import android.content.Context
 import androidx.compose.material.Scaffold
+import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.*
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.sportsprediction.core.util.TabPage
-import com.example.sportsprediction.feature_app.ui.presentation.view_model.TeamSuggestionsViewModel
-import com.example.sportsprediction.feature_app.data.local.entities.team_event.TeamEventEntity
-import com.example.sportsprediction.feature_app.ui.presentation.composables.components.BetSuggestionsFloatingActionButton
+import com.example.sportsprediction.core.util.Constants
+import com.example.sportsprediction.core.util.Constants.ArrangementOrder
+import com.example.sportsprediction.core.util.Constants.Descending
+import com.example.sportsprediction.core.util.Constants.Market_Type
+import com.example.sportsprediction.core.util.Constants.SuggestionGroupOption
+import com.example.sportsprediction.core.util.UIEvent
 import com.example.sportsprediction.feature_app.ui.presentation.composables.components.PredictionsScreenTopBar
-import com.example.sportsprediction.feature_app.ui.presentation.composables.prediction.*
+import com.example.sportsprediction.feature_app.ui.presentation.composables.prediction.PredictionsContent
 import com.example.sportsprediction.feature_app.ui.presentation.view_model.TeamEventsStatsViewModel
 import com.example.sportsprediction.feature_app.ui.presentation.view_model.TeamNameEventsViewModel
+import com.example.sportsprediction.feature_app.ui.presentation.view_model.TeamSuggestionsViewModel
+import kotlinx.coroutines.flow.collectLatest
 import java.util.*
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun PredictionsScreen(
     teamSuggestionsViewModel: TeamSuggestionsViewModel = hiltViewModel(),
@@ -29,87 +33,142 @@ fun PredictionsScreen(
     headToHeadId: String,
     eventId: String,
     tournamentInfo: String,
-    navigateBack: () -> Unit
+    navigateBack: () -> Unit,
 ){
-    val teamEventEntity by teamNameEventsViewModel.teamEventEntity.collectAsState(
-        initial = TeamEventEntity(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null))
+    val scaffoldState = rememberScaffoldState()
 
+    val context = LocalContext.current
+    val sportPredictionPreferences = context.getSharedPreferences(Constants.SportsPredictionPreferences, Context.MODE_PRIVATE)
 
+    val suggestionGrouping = sportPredictionPreferences.getString(SuggestionGroupOption, Market_Type) ?: Market_Type
+    val suggestionsArrangement = sportPredictionPreferences.getString(ArrangementOrder, Descending) ?: Descending
+    val percentageFilterValue = sportPredictionPreferences.getString(Constants.PercentageFilter, "50") ?: "50"
+
+    val loadedSuggestions = teamSuggestionsViewModel.loadTeamSuggestionState.value.suggestions
+    val filteredSuggestions = teamSuggestionsViewModel.filteredSuggestions.value.filteredSuggestions
+
+    var percentageFilterValueHasChanged by remember {
+        mutableStateOf(false)
+    }
     LaunchedEffect(Unit) {
-
-        teamNameEventsViewModel.getTeamNameEventEntity(eventId.toInt(), mainTeamId.toInt())
-
-        teamEventsStatsViewModel.getTeamEventStats(mainTeamId.toInt())
-
-        teamSuggestionsViewModel.getSuggestions(
+        teamSuggestionsViewModel.loadTeamSuggestion(
             teamId = mainTeamId.toInt(),
             teamName = mainTeamName,
             date = Date()
         )
-        if (teamSuggestionsViewModel.calculateBetConfidenceLevel){
-            teamSuggestionsViewModel.getBetorsConfidence(teamSuggestionsViewModel.betSlip.toList().toSet().toList())
+
+    }
+
+    LaunchedEffect(loadedSuggestions) {
+        val percentage = percentageFilterValue.toDouble().div(100.0)
+        if (loadedSuggestions.isNotEmpty()) {
+            teamSuggestionsViewModel.saveTeamSuggestionEntity(mainTeamId.toInt(), mainTeamName, Date(), loadedSuggestions)
+            teamSuggestionsViewModel.groupSuggestions(loadedSuggestions, percentage, suggestionsArrangement, suggestionGrouping)
+            teamSuggestionsViewModel.initializeFilteredSuggestions(loadedSuggestions)
+        }
+        teamEventsStatsViewModel.getTeamEventStats(mainTeamId.toInt())
+    }
+
+    LaunchedEffect(filteredSuggestions) {
+        val percentage = percentageFilterValue.toDouble().div(100.0)
+        if (filteredSuggestions.isNotEmpty()) {
+            teamSuggestionsViewModel.groupSuggestions(filteredSuggestions, percentage, suggestionsArrangement, suggestionGrouping)
         }
     }
-    val coroutineScope = rememberCoroutineScope()
+
+    when(percentageFilterValueHasChanged){
+        true-> {
+            val percentage = percentageFilterValue.toDouble().div(100.0)
+            teamSuggestionsViewModel.groupSuggestions(filteredSuggestions, percentage, suggestionsArrangement, suggestionGrouping)
+            percentageFilterValueHasChanged = !percentageFilterValueHasChanged
+        }
+        else-> { /* Todo */ }
+    }
+
+
+    /*
+    LaunchedEffect(groupedSuggestions){
+        val dateToLocalDate = Date().toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
+        val dateString = Functions.shortDateFormatter.format(dateToLocalDate)
+        val localDate = LocalDate.parse(dateString, Functions.shortDateFormatter)
+        val newDate = localDate.toDate()
+
+        teamSuggestionsViewModel.getTeamSuggestion(mainTeamId.toInt(), mainTeamName, newDate, suggestions)
+    }
+    */
+
+
+    /*
     val pagerState = rememberPagerState(
         initialPage = 0,
         initialPageOffsetFraction = 0f
     ) { TabPage.values().size }
+    */
 
 
-
-
-    Scaffold(
-        topBar = {
-            PredictionsScreenTopBar(label = mainTeamName) { navigateBack() }
-        },
-        floatingActionButton = {
-            if (!teamSuggestionsViewModel.openFilterCard && !teamSuggestionsViewModel.openBetSlip) {
-                BetSuggestionsFloatingActionButton {
-                    teamSuggestionsViewModel.onOpenAndCloseBetSlip()
+    LaunchedEffect(key1 = true){
+        teamSuggestionsViewModel.eventFlow.collectLatest { eventFlow->
+            when (eventFlow){
+                is UIEvent.ShowSnackBar -> {
+                    scaffoldState.snackbarHostState.showSnackbar(
+                        message = eventFlow.message
+                    )
                 }
             }
         }
+    }
+
+    Scaffold(
+        topBar = {
+            PredictionsScreenTopBar(
+                label = mainTeamName,
+                openOrCloseFilterCard = {
+                    teamSuggestionsViewModel.onOpenOrCloseFilterCard()
+                }
+            ) { navigateBack() }
+        },
+        floatingActionButton = {
+        },
+        scaffoldState = scaffoldState,
     ) {
         it
-        val teamNameEventEntities = teamNameEventsViewModel.listOfTeamEventState.value.listOfTeamEvent
         PredictionsContent(
             mainTeamName = mainTeamName,
-            mainTeamId = mainTeamId,
             opponentTeamName = opponentTeamName,
             opponentTeamId = opponentTeamId,
-            mainTeamPlayingLocation = mainTeamPlayingLocation,
             eventId = eventId,
             headToHeadId = headToHeadId,
+            mainTeamPlayingLocation = mainTeamPlayingLocation,
             tournamentInfo = tournamentInfo,
-            teamEventEntity = if(teamNameEventEntities.isNotEmpty()) teamNameEventEntities.first() else null,
-            teamSuggestion = teamSuggestionsViewModel.suggestionsState.value.teamSuggestions,
-            addToBetSlip = {mainTeamName, mainTeamId, opponentTeamName, opponentTeamId, eventId, headToHeadId, mainTeamPlayingLocation,marketName, numerator, denominator, percentageText, marketCategory, marketType, matchPeriod, team->
-                teamSuggestionsViewModel.addToBetSip(mainTeamName, mainTeamId, opponentTeamName, opponentTeamId, eventId, headToHeadId, mainTeamPlayingLocation,marketName, numerator, denominator, percentageText, marketCategory, marketType, matchPeriod, team)
+            closeFilterCard = { teamSuggestionsViewModel.onCloseFilterCard() },
+            orderSuggestions = {_arrangementOrder ->
+                teamSuggestionsViewModel.orderSuggestions(filteredSuggestions, _arrangementOrder)
             },
-            betList = teamSuggestionsViewModel.betSlip.toList().toSet().toList(),
-            confidenceLevel = teamSuggestionsViewModel.confidenceLevelState.value.confidenceLevel,
-            showBetSlip = teamSuggestionsViewModel.openBetSlip,
+            filterSuggestionsByTeam = { _teams ->
+                teamSuggestionsViewModel.getFilterSuggestionsByTeams(loadedSuggestions, _teams)
+            },
+            filterSuggestionsByMatchPeriod = { _matchPeriod ->
+                teamSuggestionsViewModel.filterSuggestionsByMatchPeriod(loadedSuggestions, _matchPeriod)
+            },
+            filterSuggestionsByMarketCategory = { _marketCategories ->
+                teamSuggestionsViewModel.filterSuggestionsByMarketCategory(loadedSuggestions, _marketCategories)
+            },
+            filterSuggestionsByMarketType = {_marketTypes ->
+                teamSuggestionsViewModel.filterSuggestionsByMarketType(loadedSuggestions, _marketTypes)
+            },
+            filterSuggestionsByPercentage = {
+                percentageFilterValueHasChanged = true
+            },
+            groupSuggestionsBy = {_suggestionGrouping ->
+                teamSuggestionsViewModel.groupSuggestionsBy(filteredSuggestions, _suggestionGrouping)
+            },
+            groupedSuggestions = teamSuggestionsViewModel.groupedSuggestions.value.groupedSuggestions,
             openFilterCard = teamSuggestionsViewModel.openFilterCard,
-            openOrCloseFilterCard = {teamSuggestionsViewModel.onOpenOrCloseFilterCard()},
-            calculateBetConfidenceLevel = {suggestion, betBuilder -> teamSuggestionsViewModel.getBetorsConfidence(suggestion,betBuilder) },
-            isLoadingConfidenceLevel = teamSuggestionsViewModel.confidenceLevelState.value.isLoading,
-            closeBetSlip = {teamSuggestionsViewModel.onCloseBetSlip()},
-            openBetSlip = {teamSuggestionsViewModel.onOpenBetSlip()},
-            isRefreshing = teamSuggestionsViewModel.suggestionsState.value.isLoading,
-            getSuggestions = {teamSuggestionsViewModel.getSuggestions(mainTeamId.toInt(), mainTeamName, Date())},
-            isLoadingSuggestions = teamSuggestionsViewModel.suggestionsState.value.isLoading,
-            isLoadingTeamNameEventEntity = teamNameEventsViewModel.listOfTeamEventState.value.isLoading,
-            removeAllBet = { teamSuggestionsViewModel.removeEverythingFromBetSip() },
-            removeBet = {betBuilder -> teamSuggestionsViewModel.removeFromBetSip(betBuilder) },
-            teamEventsStats = teamEventsStatsViewModel.listOfTeamEventsStatsState.value.listOfAllTeamEventsStats,
-            isLoadingTeamEventStats = teamEventsStatsViewModel.listOfTeamEventsStatsState.value.isLoading,
-            openStatsCard = teamEventsStatsViewModel.openStatsCard,
-            onOpenStatsCard = {teamEventsStatsViewModel.onOpenStatsCard()},
-            onCloseStatsCard = {teamEventsStatsViewModel.onCloseStatsCard()},
+            isLoadingSuggestions = teamSuggestionsViewModel.loadTeamSuggestionState.value.isLoading,
+            teamEventsStats = teamEventsStatsViewModel.listOfTeamEventsStatsState.value.listOfAllTeamEventsStats
         )
 
-/*
+    /*
 
         Column(modifier = Modifier) {
             HorizontalScrollPager(
@@ -155,14 +214,15 @@ fun PredictionsScreen(
                 }
 
                 */
-/*
+
+    /*
                 teamEventEntity = teamEventEntity,
                 teamSuggestion = teamSuggestionsViewModel.teamSuggestionsState.value.teamSuggestions
                  *//*
 
             )
         }
-*/
+        */
 
         /*PredictionsContent(
             teamEventEntity = teamEventEntity,

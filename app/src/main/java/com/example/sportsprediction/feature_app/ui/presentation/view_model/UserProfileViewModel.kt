@@ -1,5 +1,6 @@
 package com.example.sportsprediction.feature_app.ui.presentation.view_model
 
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -9,6 +10,7 @@ import com.example.sportsprediction.core.util.Constants.emptyString
 import com.example.sportsprediction.core.util.Resource
 import com.example.sportsprediction.feature_app.data.local.entities.user_profile.UserEntity
 import com.example.sportsprediction.feature_app.domain.repository.UserProfileRepository
+import com.example.sportsprediction.feature_app.ui.presentation.view_model.states.UserProfileState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -20,21 +22,16 @@ class UserProfileViewModel @Inject constructor(
     private val userProfileRepository: UserProfileRepository
 ): ViewModel() {
 
-    var user by mutableStateOf(UserEntity(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null))
+
+    private val _userProfileState = mutableStateOf(UserProfileState())
+    val userProfileState: State<UserProfileState> = _userProfileState
+
+
+    var user by mutableStateOf(UserEntity( null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null))
         private set
 
     var error by mutableStateOf(emptyString)
         private set
-
-    var successMessage by mutableStateOf(emptyString)
-        private set
-
-    var RegisterMessages by mutableStateOf(emptyList<String>())
-        private set
-
-    var LoginMessages by mutableStateOf(emptyList<String>())
-        private set
-
 
     var errorMessage by mutableStateOf(emptyString)
         private set
@@ -43,38 +40,29 @@ class UserProfileViewModel @Inject constructor(
         private set
 
 
-    fun registerUser(user: UserEntity) = viewModelScope.launch{
-        userProfileRepository.registerUser(user).onEach { response->
+    fun insertUser(user: UserEntity) = viewModelScope.launch{
+        userProfileRepository.insertUser(user).onEach { response->
             when(response){
                 is Resource.Success ->{
-                    successMessage = response.data.toString()
-                    RegisterMessages = listOf(successMessage)
+                    _userProfileState.value = userProfileState.value.copy(
+                        success = response.data,
+                        isSaving = false,
+                        error = null
+                    )
                 }
                 is Resource.Loading ->{
+                    _userProfileState.value= userProfileState.value.copy(
+                        success = null,
+                        isSaving = true,
+                        error = null
+                    )
                 }
                 is Resource.Error ->{
-                    error =  response.data.toString()
-                    errorMessage = response.message.toString()
-                    RegisterMessages = listOf(errorMessage, error)
-                }
-            }
-        }.launchIn(this)
-
-    }
-
-    fun loginUser(username: String, password: String) = viewModelScope.launch{
-        userProfileRepository.loginUser(username, password).onEach { response->
-            when(response){
-                is Resource.Success ->{
-                    successMessage = response.data.toString()
-                    LoginMessages = listOf(successMessage)
-                }
-                is Resource.Loading ->{
-                }
-                is Resource.Error ->{
-                    error =  response.data.toString()
-                    errorMessage = response.message.toString()
-                    LoginMessages = listOf(errorMessage, error)
+                    _userProfileState.value= userProfileState.value.copy(
+                        success = null,
+                        isSaving = false,
+                        error = "Unable to insert User"
+                    )
                 }
             }
         }.launchIn(this)
@@ -82,7 +70,7 @@ class UserProfileViewModel @Inject constructor(
     }
 
     fun getUser(username: String, password: String) = viewModelScope.launch{
-        user = userProfileRepository.getUser(username, password) ?: UserEntity(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null)
+        user = userProfileRepository.getUser(username, password) ?: UserEntity(null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null)
     }
 
 }

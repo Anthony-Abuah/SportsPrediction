@@ -10,11 +10,16 @@ import com.example.sportsprediction.feature_app.data.local.entities.tipster.data
 import com.example.sportsprediction.feature_app.data.local.entities.user_profile.UserEntity
 import com.example.sportsprediction.feature_app.data.local.entities.user_profile.data_classes.Comment
 import com.example.sportsprediction.feature_app.data.local.entities.user_profile.data_classes.Reaction
+import com.example.sportsprediction.feature_app.data.local.entities.user_profile.data_classes.UserSubscription
 
 
 typealias BankAccounts = List<BankAccount>
 
 typealias Comments = List<Comment>
+
+typealias Ratings = List<Rating>
+
+typealias MonthlyRatings = List<Rating>
 
 typealias Reactions = List<Reaction>
 
@@ -23,6 +28,8 @@ typealias Subscribers = List<Subscriber>
 typealias Posts = List<Post>
 
 typealias Tips = List<Tip>
+
+typealias UserSubscriptions = List<UserSubscription>
 
 typealias Tipsters = List<TipsterEntity>
 
@@ -41,4 +48,6 @@ typealias ListOfEventOdds = List<EventOddsEntity>
 typealias ListOfEventStats = List<EventStatsEntity>
 
 typealias Users = List<UserEntity>
+
+//typealias Suggestions = List<Suggestion>
 

@@ -1,34 +1,24 @@
 package com.example.sportsprediction.feature_app.ui.presentation.composables.prediction
 
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.sp
-import com.example.sportsprediction.core.util.Constants
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import com.example.sportsprediction.core.util.Constants.Home
-import com.example.sportsprediction.core.util.Constants.No_Stats
+import com.example.sportsprediction.core.util.Functions.getMatchResult
+import com.example.sportsprediction.core.util.Functions.longDateFormatter
 import com.example.sportsprediction.core.util.Functions.mapCategoryToScores
 import com.example.sportsprediction.feature_app.data.local.entities.event_stats.EventStatsEntity
-import com.example.sportsprediction.feature_app.ui.presentation.composables.components.BasicText
-import com.example.sportsprediction.feature_app.ui.presentation.composables.components.SuggestionPercentageText
-import com.example.sportsprediction.feature_app.ui.presentation.composables.event_info.HeadToHeadScoresInfo
+import com.example.sportsprediction.feature_app.ui.presentation.composables.event_info.EventScoresInfo
 import com.example.sportsprediction.feature_app.ui.theme.LocalSpacing
-import com.example.sportsprediction.feature_app.ui.theme.PrimaryThemeColor
 import java.time.Instant
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -36,130 +26,72 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun StatsCard(
     category: String,
-    isLoading: Boolean,
-    //tournament: String,
+    playingLocation: String,
     teamEventStats: List<EventStatsEntity>,
-    closeStatsCard: () -> Unit
 ) {
-    val homeFiltered = teamEventStats.filter { stat->
-        stat.location == Home
-    }
-    Card(
-        shape = MaterialTheme.shapes.large,
-        colors = CardDefaults.cardColors(
-            contentColor = Color.Black,
-            containerColor = Color.White,
-        ),
+    Column(
         modifier = Modifier
-            .fillMaxSize()
-            .padding(LocalSpacing.current.noPadding),
-        elevation = CardDefaults.cardElevation(defaultElevation = LocalSpacing.current.small)
+            .fillMaxWidth()
+            .heightIn(min = 16.dp, max = 500.dp)
+            .background(MaterialTheme.colorScheme.background)
+            .padding(LocalSpacing.current.noPadding)
+            .verticalScroll(state = ScrollState(0), enabled = true),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Top,
     ) {
-        val longFormat = DateTimeFormatter.ofPattern(Constants.longDateFormat)
 
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight()
-                .background(PrimaryThemeColor)
-                .padding(LocalSpacing.current.noPadding)
-                .clickable { closeStatsCard() },
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
-        ){
-            Icon(imageVector = Icons.Default.KeyboardArrowDown,
-                contentDescription = "",
-                tint = Color.White
-            )
-        }
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight()
-                .padding(LocalSpacing.current.small),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
+        Row(modifier = Modifier.fillMaxWidth()
+            .background(MaterialTheme.colorScheme.background),
         ) {
-            Box(
-                modifier = Modifier
-                    .weight(1f)
-                    .background(Color.Transparent, MaterialTheme.shapes.large)
-                    .padding(LocalSpacing.current.smallMedium),
-                contentAlignment = Alignment.Center
-            ) {
-                SuggestionPercentageText(
-                    text = category,
-                    fontSize = 18.sp,
-                    textColor = PrimaryThemeColor
-                )
-            }
-        }
-
-        val scrollState = rememberScrollState(0)
-
-
-        if (teamEventStats.isEmpty()){
             Box(modifier = Modifier
-                .fillMaxSize(1f)
-                .padding(LocalSpacing.current.small), contentAlignment = Alignment.Center){
-                BasicText(
-                    text = No_Stats,
-                    fontSize = 15.sp,
-                    textColor = Color.Gray
+                .fillMaxWidth()
+                .padding(LocalSpacing.current.small),
+                contentAlignment = Alignment.Center
+            ){
+                Text(
+                    text = category,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    style = MaterialTheme.typography.titleMedium
                 )
             }
         }
-        else{
-            if (isLoading){
-                Box(modifier = Modifier
-                    .fillMaxSize(1f)
-                    .padding(LocalSpacing.current.small), contentAlignment = Alignment.Center){
-                    CircularProgressIndicator()
-                }
-            }
-            else {
-                Column(
-                    modifier = Modifier
-                        .fillMaxHeight(1f)
-                        .verticalScroll(state = scrollState, enabled = true)
-                ) {
 
-                    Card(
-                        shape = RoundedCornerShape(LocalSpacing.current.noPadding),
-                        colors = CardDefaults.cardColors(
-                            contentColor = Color.Black,
-                            containerColor = Color.White,
-                        ),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = LocalSpacing.current.small),
-                        elevation = CardDefaults.cardElevation(defaultElevation = LocalSpacing.current.smallMedium)
-                    ) {
-                        teamEventStats.forEach {eventStats->
-                            val timeStamp = eventStats.startTimestamp?.toLong()
-                            val timeStampAsDateTimeString = DateTimeFormatter.ISO_INSTANT.format(timeStamp?.let { Instant.ofEpochSecond(it) })
-                            val date = LocalDate.parse(timeStampAsDateTimeString, longFormat)
+        teamEventStats.forEach { eventStats ->
+            val timeStamp = eventStats.startTimestamp?.toLong()
+            val timeStampAsDateTimeString = DateTimeFormatter.ISO_INSTANT.format(timeStamp?.let { Instant.ofEpochSecond(it) })
+            val date = LocalDate.parse(timeStampAsDateTimeString, longDateFormatter)
+            val categoryScores = mapCategoryToScores(category, eventStats)
+            val homeScore = categoryScores.first()
+            val awayScore = categoryScores.last()
+            val result = if (categoryScores.isNotEmpty()) {
+                getMatchResult(
+                    playingLocation,
+                    try {
+                        homeScore.toInt()
+                    }catch (e:Exception){0},
+                    try {
+                        awayScore.toInt()
+                    }catch (e:Exception){0}
+                )
+            } else 0.0
+            EventScoresInfo(
+                date = "$date",
+                homeTeam = eventStats.homeTeamName!!,
+                homeScore = homeScore,
+                awayTeam = eventStats.awayTeamName!!,
+                awayScore = awayScore,
+                result = result
+            )
 
-                            HeadToHeadScoresInfo(
-                                date = "$date",
-                                homeTeam = eventStats.homeTeamName!!,
-                                homeScore = mapCategoryToScores(category, eventStats).first(),
-                                awayTeam = eventStats.awayTeamName!!,
-                                awayScore = mapCategoryToScores(category, eventStats).last()
-                            )
-
-                            Divider(
-                                modifier = Modifier.padding(
-                                    start = LocalSpacing.current.extraSmall,
-                                    end = LocalSpacing.current.extraSmall
-                                )
-                            )
-                        }
-
-                    }
-                }
-            }
-
+            Divider(
+                color = MaterialTheme.colorScheme.onBackground,
+                thickness = LocalSpacing.current.thinBorder,
+                modifier = Modifier.padding(
+                    start = LocalSpacing.current.extraSmall,
+                    end = LocalSpacing.current.extraSmall
+                )
+            )
         }
 
     }

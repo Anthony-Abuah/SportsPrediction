@@ -15,7 +15,7 @@ fun BottomNavGraph (){
     val mainNavController = rememberNavController()
     NavHost(
         navController = mainNavController,
-        startDestination = BottomNavScreens.BuildBet.route)
+        startDestination = BottomNavScreens.Events.route)
     {
         composable(route = BottomNavScreens.Events.route){
             EventsNavGraph(mainNavController)

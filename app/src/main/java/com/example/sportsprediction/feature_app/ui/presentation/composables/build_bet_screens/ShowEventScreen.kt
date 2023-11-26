@@ -29,27 +29,24 @@ fun ShowEventsScreen(
 
     LaunchedEffect(Unit) {
         teamNameEventsViewModel.getTeamsPastEvents(listOfEvents, theDate)
-        teamEventsStatsViewModel.getTeamsPastEventStats(listOfEvents, theDate, 2, 2)
     }
 
     Scaffold(
         topBar = {
             BuildBetScreenTopBar(
-                label = "Previous Events",
-                openSearchCard = {
-                    dateEventsViewModel.onOpenOrCloseSearchCard()
-                    dateEventsViewModel.onCloseFilterCard()
-                },
                 openFilterCard = {
                     dateEventsViewModel.onOpenOrCloseFilterCard()
                     dateEventsViewModel.onCloseSearchCard()
+                },
+                openSearchCard = {
+                    dateEventsViewModel.onOpenOrCloseSearchCard()
+                    dateEventsViewModel.onCloseFilterCard()
                 },
                 navigateBack = navigateBack
             )
         },
         floatingActionButton = {
             BuildBetFloatingActionButton {
-                teamEventsStatsViewModel.getTeamsPastEventStats(listOfEvents, theDate, 2, 2)
                 navigateToSuggestionsScreen()
             }
         },

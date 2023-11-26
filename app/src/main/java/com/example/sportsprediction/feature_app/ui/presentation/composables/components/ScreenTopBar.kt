@@ -1,29 +1,65 @@
 package com.example.sportsprediction.feature_app.ui.presentation.composables.components
 
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.TopAppBar
+
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import com.example.sportsprediction.R
 import com.example.sportsprediction.core.util.Constants.MatchInfo
-import com.example.sportsprediction.feature_app.ui.theme.PrimaryThemeColor
-import com.example.sportsprediction.feature_app.ui.theme.TopBarTextColor
+import com.example.sportsprediction.core.util.Constants.emptyString
+import com.example.sportsprediction.feature_app.ui.theme.*
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PredictionsScreenTopBar(
     label: String,
+    openOrCloseFilterCard: () -> Unit,
     moreOptions: () -> Unit
 ) {
     TopAppBar (
         title = {
-            PredictionBarTitle(title = label, 18.sp, TopBarTextColor)
+            Row(modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Box(modifier = Modifier.weight(4f),
+                contentAlignment = Alignment.CenterStart) {
+                    Text(
+                        text = label,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+                Box(modifier = Modifier.weight(1f)
+                    .padding(end = LocalSpacing.current.small)
+                    .clickable {
+                        openOrCloseFilterCard()
+                    },
+                contentAlignment = Alignment.CenterEnd) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.filter),
+                        tint  = MaterialTheme.colorScheme.onBackground,
+                        contentDescription = emptyString
+                    )
+                }
+
+            }
         },
-        backgroundColor = PrimaryThemeColor,
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.background,
+            titleContentColor = MaterialTheme.colorScheme.onBackground,
+            navigationIconContentColor = MaterialTheme.colorScheme.onBackground
+        ),
         navigationIcon = {
             IconButton(
                 onClick = moreOptions
@@ -31,7 +67,7 @@ fun PredictionsScreenTopBar(
                 Icon(
                     imageVector = Icons.Default.ArrowBack,
                     contentDescription = null,
-                    tint = TopBarTextColor
+                    tint = MaterialTheme.colorScheme.onBackground
                 )
             }
         }
@@ -40,15 +76,24 @@ fun PredictionsScreenTopBar(
 }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EventsInfoScreenTopBar(
     navigateBack: () -> Unit
 ) {
+
+    val backgroundColor = Blue10
+    val contentColor = BlueGrey90
+
     TopAppBar (
         title = {
-            Text(text = MatchInfo, style = MaterialTheme.typography.h5)
+            Text(text = MatchInfo, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
         },
-        backgroundColor = PrimaryThemeColor,
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = backgroundColor,
+            titleContentColor = contentColor,
+            navigationIconContentColor = contentColor
+        ),
         navigationIcon = {
             IconButton(
                 onClick = navigateBack
@@ -56,7 +101,37 @@ fun EventsInfoScreenTopBar(
                 Icon(
                     imageVector = Icons.Default.ArrowBack,
                     contentDescription = null,
-                    tint = Color.White
+                    tint = contentColor
+                )
+            }
+        }
+    )
+
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun UserPreferencesTopBar(
+    navigateBack: () -> Unit
+) {
+    TopAppBar (
+        title = {
+            Text(text = "Preferences", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
+        },
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.background,
+            titleContentColor = MaterialTheme.colorScheme.onBackground,
+            navigationIconContentColor = MaterialTheme.colorScheme.onBackground
+        ),
+        navigationIcon = {
+            IconButton(
+                onClick = navigateBack
+            ) {
+                Icon(
+                    imageVector = Icons.Default.ArrowBack,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.background
                 )
             }
         }
@@ -66,6 +141,7 @@ fun EventsInfoScreenTopBar(
 
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TipstersScreenTopBar(
     label: String,
@@ -81,7 +157,11 @@ fun TipstersScreenTopBar(
                 navigateToRegisterTipster()
             }
         },
-        backgroundColor = PrimaryThemeColor,
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.background,
+            titleContentColor = MaterialTheme.colorScheme.onBackground,
+            navigationIconContentColor = MaterialTheme.colorScheme.onBackground
+        ),
         navigationIcon = {
             IconButton(
                 onClick = moreOptions
@@ -89,7 +169,7 @@ fun TipstersScreenTopBar(
                 Icon(
                     imageVector = Icons.Default.ArrowBack,
                     contentDescription = null,
-                    tint = TopBarTextColor
+                    tint = MaterialTheme.colorScheme.onBackground
                 )
             }
         },
@@ -98,9 +178,9 @@ fun TipstersScreenTopBar(
 }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BuildBetScreenTopBar(
-    label: String,
     openFilterCard: () -> Unit,
     openSearchCard: () -> Unit,
     navigateBack: () -> Unit,
@@ -108,12 +188,15 @@ fun BuildBetScreenTopBar(
     TopAppBar (
         title = {
             BuildBetTopAppBar(
-                title = label,
                 openFilterCard = openFilterCard,
                 openSearchCard = openSearchCard,
-                )
+            )
         },
-        backgroundColor = PrimaryThemeColor,
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.background,
+            titleContentColor = MaterialTheme.colorScheme.onBackground,
+            navigationIconContentColor = MaterialTheme.colorScheme.onBackground
+        ),
         navigationIcon = {
             IconButton(
                 onClick = navigateBack
@@ -121,7 +204,7 @@ fun BuildBetScreenTopBar(
                 Icon(
                     imageVector = Icons.Default.ArrowBack,
                     contentDescription = null,
-                    tint = TopBarTextColor
+                    tint = MaterialTheme.colorScheme.onBackground
                 )
             }
         },

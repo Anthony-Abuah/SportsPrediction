@@ -185,7 +185,8 @@ class TeamEventRepositoryImpl(
         return formPercentage
     }
 
-    override suspend fun getTeamFormPercentage(teamId: Int): Double{
+    override suspend fun getTeamFormPercentage(teamId: Int): Flow<Resource<Double>> = flow{
+        emit(Resource.Loading())
         val formEvents  = teamEventDao.getTeamFormEvents(teamId)?.take(5) ?: emptyList()
 
         var formPercentageValue = 0.0
@@ -215,8 +216,7 @@ class TeamEventRepositoryImpl(
         }catch (e: ArithmeticException){
             0.0
         }
-
-        return formPercentage
+        emit(Resource.Success(formPercentage))
     }
 
     override suspend fun getOpponentFormMultiplierValue(teamId: Int, headToHeadEventId: String): Double{

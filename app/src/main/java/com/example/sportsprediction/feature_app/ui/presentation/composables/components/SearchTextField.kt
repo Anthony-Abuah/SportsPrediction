@@ -4,13 +4,14 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.Icon
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -56,7 +57,7 @@ fun SearchTextField(
                     Icon(
                         imageVector = Icons.Default.Search,
                         contentDescription = "",
-                        tint = Color.Gray
+                        tint = MaterialTheme.colorScheme.onSurface
                     )
 
                 },
@@ -67,19 +68,19 @@ fun SearchTextField(
                         },
                             imageVector = Icons.Default.Close,
                             contentDescription = "",
-                            tint = Color.Gray
+                            tint = MaterialTheme.colorScheme.onSurface
                         )
                     }
 
                 },
                 colors = TextFieldDefaults.textFieldColors(
-                    backgroundColor = Color.White,
-                    focusedIndicatorColor = Color.DarkGray,
-                    unfocusedIndicatorColor = Color.Transparent,
-                    cursorColor = Color.Black,
-                    focusedLabelColor = Color.Black,
-                    unfocusedLabelColor = Color.Black,
-                    disabledLabelColor = Color.Black,
+                    backgroundColor = MaterialTheme.colorScheme.surface,
+                    focusedIndicatorColor = MaterialTheme.colorScheme.onSurface,
+                    unfocusedIndicatorColor = MaterialTheme.colorScheme.onSurface,
+                    cursorColor = MaterialTheme.colorScheme.onSurface,
+                    focusedLabelColor = MaterialTheme.colorScheme.surfaceVariant,
+                    unfocusedLabelColor = MaterialTheme.colorScheme.surfaceVariant,
+                    disabledLabelColor = MaterialTheme.colorScheme.surfaceVariant,
                 ),
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(
@@ -87,7 +88,7 @@ fun SearchTextField(
                     imeAction = ImeAction.Done
                 ),
                 textStyle = TextStyle(
-                    color = Color.Black,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontSize = 14.sp,
                     textAlign = TextAlign.Start
                 ),
@@ -101,13 +102,13 @@ fun SearchTextField(
                 getValue(value)
                 closeDialog()
             }
-            .background(if (value.isEmpty()) Color.Red else PrimaryThemeColor),
+            .background(if (value.isEmpty()) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primaryContainer),
             contentAlignment = Alignment.Center
         ) {
             Icon(modifier = Modifier.padding(LocalSpacing.current.small),
                 imageVector = if (value.isEmpty()) Icons.Default.Close else Icons.Default.ArrowForward,
                 contentDescription = "",
-                tint = Color.White
+                tint = if (value.isEmpty()) MaterialTheme.colorScheme.onError else MaterialTheme.colorScheme.onPrimaryContainer
             )
         }
 

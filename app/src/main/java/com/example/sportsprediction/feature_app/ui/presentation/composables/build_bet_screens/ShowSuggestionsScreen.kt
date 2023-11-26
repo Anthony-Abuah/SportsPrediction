@@ -25,21 +25,20 @@ fun ShowSuggestionsScreen(
 
 
     LaunchedEffect(Unit) {
-        teamSuggestionsViewModel.getAndDisplayBetBuildersSuggestions(listOfEvents, theDate)
+        //teamSuggestionsViewModel.getAndDisplayBetBuildersSuggestions(listOfEvents, theDate)
     }
 
 
     Scaffold(
         topBar = {
             BuildBetScreenTopBar(
-                label = "Suggestions",
-                openSearchCard = {
-                    dateEventsViewModel.onOpenOrCloseSearchCard()
-                    dateEventsViewModel.onCloseFilterCard()
-                },
                 openFilterCard = {
                     dateEventsViewModel.onOpenOrCloseFilterCard()
                     dateEventsViewModel.onCloseSearchCard()
+                },
+                openSearchCard = {
+                    dateEventsViewModel.onOpenOrCloseSearchCard()
+                    dateEventsViewModel.onCloseFilterCard()
                 },
                 navigateBack = navigateBack
             )

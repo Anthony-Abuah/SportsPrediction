@@ -68,6 +68,7 @@ fun EventsInfoScreen(
             teamId = homeTeamId.toInt(),
             headToHeadEventId = headToHeadId
         )
+        /*
         teamNameEventsViewModel.getHomeTeamFormPercentage(
             teamId = homeTeamId.toInt()
         )
@@ -75,6 +76,7 @@ fun EventsInfoScreen(
         teamNameEventsViewModel.getAwayTeamFormPercentage(
             teamId = awayTeamId.toInt()
         )
+        */
 
         eventOddsViewModel.getRemoteHomeTeamEvents(
             homeTeamId = homeTeamId.toInt(),
@@ -86,9 +88,18 @@ fun EventsInfoScreen(
         preferredEventsViewModel.getPreferredEvent(
             eventId = eventId.toInt()
         )
+    }
 
+    LaunchedEffect(teamNameEventsViewModel.homeListOfTeamEventState.value.listOfTeamEvent){
+        teamNameEventsViewModel.getHomeTeamFormPercentage(
+            teamId = homeTeamId.toInt()
+        )
+    }
 
-
+    LaunchedEffect(teamNameEventsViewModel.awayListOfTeamEventState.value.listOfTeamEvent){
+        teamNameEventsViewModel.getAwayTeamFormPercentage(
+            teamId = awayTeamId.toInt()
+        )
     }
 
     Scaffold(
@@ -106,9 +117,11 @@ fun EventsInfoScreen(
                     eventId = eventId,
                     headToHeadId = headToHeadId,
                     preferredEvent = thePreferredEvent,
-                    getTeamStats = {mainTeamId, headToHeadId, eventId, date, numberOfPastEvents, numberOfHeadToHeadEvents->
+                    isLoadingHomeTeamStats = teamEventsStatsViewModel.listOfHomeTeamEventsStatsState.value.isLoading,
+                    homeTeamStatsHaveBeenLoaded = teamEventsStatsViewModel.listOfHomeTeamEventsStatsState.value.listOfAllTeamEventsStats.isNotEmpty(),
+                    loadHomeTeamStats = { mainTeamId, headToHeadId, eventId, date, numberOfPastEvents, numberOfHeadToHeadEvents->
                         coroutineScope.launch {
-                            teamEventsStatsViewModel.getAllTeamEventStats(
+                            teamEventsStatsViewModel.loadHomeTeamEventsStats(
                                 mainTeamId,
                                 headToHeadId,
                                 eventId,
@@ -117,14 +130,27 @@ fun EventsInfoScreen(
                                 numberOfHeadToHeadEvents
                             )
                         }
-
+                    },
+                    isLoadingAwayTeamStats = teamEventsStatsViewModel.listOfAwayTeamEventsStatsState.value.isLoading,
+                    awayTeamStatsHaveBeenLoaded = teamEventsStatsViewModel.listOfAwayTeamEventsStatsState.value.listOfAllTeamEventsStats.isNotEmpty(),
+                    loadAwayTeamStats = { mainTeamId, headToHeadId, eventId, date, numberOfPastEvents, numberOfHeadToHeadEvents->
+                        coroutineScope.launch {
+                            teamEventsStatsViewModel.loadAwayTeamEventsStats(
+                                mainTeamId,
+                                headToHeadId,
+                                eventId,
+                                date,
+                                numberOfPastEvents,
+                                numberOfHeadToHeadEvents
+                            )
+                        }
                     },
                     date = newDate,
                     navigateToPredictionsScreen = navigateToPredictionsScreen,
                     loadingHomeTeamEvents = teamNameEventsViewModel.homeListOfTeamEventState.value.isLoading,
                     headToHeadEvents = headToHeadEvents,
-                    homeFormPercentage = teamNameEventsViewModel.homeFormPercentage,
-                    awayFormPercentage = teamNameEventsViewModel.awayFormPercentage,
+                    homeFormPercentage = teamNameEventsViewModel.homeTeamFormPercentage.value.formPercentage,
+                    awayFormPercentage = teamNameEventsViewModel.awayTeamFormPercentage.value.formPercentage,
                     homeTeamNameEvents = teamNameEventsViewModel.homeListOfTeamEventState.value.listOfTeamEvent,
                     loadingAwayTeamEvents = teamNameEventsViewModel.awayListOfTeamEventState.value.isLoading,
                     awayTeamNameEvents = teamNameEventsViewModel.awayListOfTeamEventState.value.listOfTeamEvent,

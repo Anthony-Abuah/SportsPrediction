@@ -33,7 +33,7 @@ data class DateEvent(
     fun toPreferredEventsEntity(date: Date): EventsEntity {
         return EventsEntity(
             null,
-            date ?: Date(),
+            date,
             awayScore ?: nullInteger,
             awayTeamName ?: emptyString,
             awayTeamId ?: nullInteger,

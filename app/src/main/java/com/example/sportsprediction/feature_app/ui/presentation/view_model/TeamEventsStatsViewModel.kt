@@ -6,10 +6,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.sportsprediction.core.util.Constants.LoadingCompleted
+import com.example.sportsprediction.core.util.Constants.UnknownError
 import com.example.sportsprediction.core.util.Constants.emptyString
-import com.example.sportsprediction.core.util.ListOfEvents
 import com.example.sportsprediction.core.util.Resource
 import com.example.sportsprediction.core.util.UIEvent
+import com.example.sportsprediction.feature_app.domain.model.general.LoadStatsParameters
 import com.example.sportsprediction.feature_app.domain.repository.TeamEventStatsRepository
 import com.example.sportsprediction.feature_app.ui.presentation.view_model.states.ListOfTeamEventsStatsState
 import com.example.sportsprediction.feature_app.ui.presentation.view_model.states.TeamEventsStatsState
@@ -19,7 +21,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import java.util.Date
+import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
@@ -27,12 +29,11 @@ class TeamEventsStatsViewModel @Inject constructor(
     private val teamEventsStatsRepository: TeamEventStatsRepository
 ): ViewModel() {
 
-    private val _teamEventsStatsState = mutableStateOf(TeamEventsStatsState())
-    val teamEventsStatsState: State<TeamEventsStatsState> = _teamEventsStatsState
+    private val _listOfHomeTeamEventsStatsState = mutableStateOf(ListOfTeamEventsStatsState())
+    val listOfHomeTeamEventsStatsState: State<ListOfTeamEventsStatsState> = _listOfHomeTeamEventsStatsState
 
-
-    private val _listOfAllTeamEventsStatsState = mutableStateOf(ListOfTeamEventsStatsState())
-    val listOfAllTeamEventsStatsState: State<ListOfTeamEventsStatsState> = _listOfAllTeamEventsStatsState
+    private val _listOfAwayTeamEventsStatsState = mutableStateOf(ListOfTeamEventsStatsState())
+    val listOfAwayTeamEventsStatsState: State<ListOfTeamEventsStatsState> = _listOfAwayTeamEventsStatsState
 
     private val _listOfTeamEventsStatsState = mutableStateOf(ListOfTeamEventsStatsState())
     val listOfTeamEventsStatsState: State<ListOfTeamEventsStatsState> = _listOfTeamEventsStatsState
@@ -45,38 +46,14 @@ class TeamEventsStatsViewModel @Inject constructor(
     val eventFlow = _eventFlow.asSharedFlow()
 
 
-    var openStatsCard by mutableStateOf(false)
+    var statsLoadingMessage by mutableStateOf(emptyString)
         private set
 
     var isLoadingStats by mutableStateOf(false)
         private set
 
-    var thereIsError by mutableStateOf(false)
-        private set
 
-    var errorMessage by mutableStateOf(emptyString)
-        private set
-
-    var loadingStatsMessage by mutableStateOf(emptyString)
-        private set
-
-    var resourceSuccess by mutableStateOf(emptyString)
-        private set
-
-    var resourceFailed by mutableStateOf(emptyString)
-        private set
-
-
-    fun onOpenStatsCard(){
-        openStatsCard = true
-    }
-
-    fun onCloseStatsCard(){
-        openStatsCard = false
-    }
-
-
-    fun getAllTeamEventStats(
+    fun loadHomeTeamEventsStats(
         mainTeamId: Int,
         headToHeadId: String,
         eventId: Int,
@@ -87,32 +64,82 @@ class TeamEventsStatsViewModel @Inject constructor(
         teamEventsStatsRepository.getAllTeamEventStats(mainTeamId, headToHeadId, eventId, date, numberOfPastEvents, numberOfHeadToHeadEvents).onEach { response->
             when(response){
                 is Resource.Success ->{
-                    _listOfAllTeamEventsStatsState.value = listOfAllTeamEventsStatsState.value.copy(
+                    _listOfHomeTeamEventsStatsState.value = listOfHomeTeamEventsStatsState.value.copy(
                        listOfAllTeamEventsStats = response.data ?: emptyList(),
                        isLoading = false
                    )
                 }
                 is Resource.Loading ->{
-                    _listOfAllTeamEventsStatsState.value = listOfAllTeamEventsStatsState.value.copy(
-                        listOfAllTeamEventsStats = response.data ?: emptyList(),
+                    _listOfHomeTeamEventsStatsState.value = listOfHomeTeamEventsStatsState.value.copy(
+                        listOfAllTeamEventsStats = emptyList(),
                         isLoading = true
                     )
                 }
                 is Resource.Error ->{
-                    _listOfAllTeamEventsStatsState.value = listOfAllTeamEventsStatsState.value.copy(
-                        listOfAllTeamEventsStats = response.data ?: emptyList(),
+                    _listOfHomeTeamEventsStatsState.value = listOfHomeTeamEventsStatsState.value.copy(
+                        listOfAllTeamEventsStats = emptyList(),
                         isLoading = false
                     )
-                    thereIsError = response.message != null
-                    if (thereIsError){
-                        errorMessage = response.message.toString()
-                    }
-                    _eventFlow.emit(UIEvent.ShowSnackBar(
-                        response.message ?: "Unknown Error"
-                    ))
                 }
             }
         }.launchIn(this)
+    }
+
+
+    fun loadAwayTeamEventsStats(
+        mainTeamId: Int,
+        headToHeadId: String,
+        eventId: Int,
+        date: Date,
+        numberOfPastEvents: Int,
+        numberOfHeadToHeadEvents: Int
+        ) = viewModelScope.launch {
+        teamEventsStatsRepository.getAllTeamEventStats(mainTeamId, headToHeadId, eventId, date, numberOfPastEvents, numberOfHeadToHeadEvents).onEach { response->
+            when(response){
+                is Resource.Success ->{
+                    _listOfAwayTeamEventsStatsState.value = listOfAwayTeamEventsStatsState.value.copy(
+                       listOfAllTeamEventsStats = response.data ?: emptyList(),
+                       isLoading = false
+                   )
+                }
+                is Resource.Loading ->{
+                    _listOfAwayTeamEventsStatsState.value = listOfAwayTeamEventsStatsState.value.copy(
+                        listOfAllTeamEventsStats = emptyList(),
+                        isLoading = true
+                    )
+                }
+                is Resource.Error ->{
+                    _listOfAwayTeamEventsStatsState.value = listOfAwayTeamEventsStatsState.value.copy(
+                        listOfAllTeamEventsStats = emptyList(),
+                        isLoading = false
+                    )
+                }
+            }
+        }.launchIn(this)
+    }
+
+    fun loadSelectedTeamEventsStats(
+        parameters: List<LoadStatsParameters>
+        ) = viewModelScope.launch {
+        teamEventsStatsRepository.loadSelectedTeamEventsStats(parameters).onEach { response ->
+            when (response) {
+                is Resource.Success -> {
+                    isLoadingStats = false
+                    _eventFlow.emit(UIEvent.ShowSnackBar(response.data ?: LoadingCompleted))
+                }
+                is Resource.Loading -> {
+                    isLoadingStats = true
+                    statsLoadingMessage = response.data?: "Loading selected events stats..."
+                    _eventFlow.emit(UIEvent.ShowSnackBar(response.data ?: "Loading selected events stats..."))
+                }
+                is Resource.Error -> {
+                    isLoadingStats = false
+                    statsLoadingMessage = response.data?: "Unknown Error"
+                    _eventFlow.emit(UIEvent.ShowSnackBar(response.message ?: UnknownError))
+                }
+            }
+        }.launchIn(this)
+
     }
 
 
@@ -138,10 +165,6 @@ class TeamEventsStatsViewModel @Inject constructor(
                         listOfAllTeamEventsStats = response.data ?: emptyList(),
                         isLoading = false
                     )
-                    thereIsError = response.message != null
-                    if (thereIsError){
-                        errorMessage = response.message.toString()
-                    }
                     _eventFlow.emit(UIEvent.ShowSnackBar(
                         response.message ?: "Unknown Error"
                     ))
@@ -172,10 +195,6 @@ class TeamEventsStatsViewModel @Inject constructor(
                         teamEventsStats = response.data,
                         isLoading = false
                     )
-                    thereIsError = response.message != null
-                    if (thereIsError){
-                        errorMessage = response.message.toString()
-                    }
                     _eventFlow.emit(UIEvent.ShowSnackBar(
                         response.message ?: "Unknown Error"
                     ))
@@ -183,36 +202,5 @@ class TeamEventsStatsViewModel @Inject constructor(
             }
         }.launchIn(this)
     }
-
-
-    fun getTeamsPastEventStats(listOfEvents: ListOfEvents, date: Date, numberOfPastEvents: Int, numberOfPastHeadToHeadEvents: Int
-        ) = viewModelScope.launch {
-        teamEventsStatsRepository.getListOfTeamsPastEventsStats(listOfEvents, date, numberOfPastEvents, numberOfPastHeadToHeadEvents).onEach { response->
-            when(response){
-                is Resource.Success ->{
-                    loadingStatsMessage = response.message ?: "null success message"
-                    isLoadingStats = false
-                }
-                is Resource.Loading ->{
-                    loadingStatsMessage = response.message ?: "null loading message"
-                    isLoadingStats = true
-                }
-                is Resource.Error ->{
-                    loadingStatsMessage = response.message ?: "null error message"
-                    isLoadingStats = false
-
-                    thereIsError = response.message != null
-                    if (thereIsError){
-                        errorMessage = response.message.toString()
-                    }
-                    _eventFlow.emit(UIEvent.ShowSnackBar(
-                        response.message ?: "Unknown Error"
-                    ))
-                }
-            }
-        }.launchIn(this)
-    }
-
-
 
 }

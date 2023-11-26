@@ -5,7 +5,7 @@ import java.util.Date
 
 data class TipsterReview(
     val date: Date,
-    val user: UserEntity?,
+    val uniqueUserId: String?,
     val review: String?,
     val ratings: Double?
 )

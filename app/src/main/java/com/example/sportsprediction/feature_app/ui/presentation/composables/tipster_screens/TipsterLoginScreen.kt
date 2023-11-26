@@ -3,8 +3,8 @@ package com.example.sportsprediction.feature_app.ui.presentation.composables.tip
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import com.example.sportsprediction.feature_app.ui.presentation.composables.components.PredictionsScreenTopBar
+import com.example.sportsprediction.feature_app.ui.presentation.composables.components.UserPreferencesTopBar
 import com.example.sportsprediction.feature_app.ui.presentation.composables.tipster.TipsterLoginContent
-import com.example.sportsprediction.feature_app.ui.presentation.composables.tipster.TipsterRegistrationContent
 
 @Composable
 fun TipsterLoginScreen(
@@ -13,7 +13,7 @@ fun TipsterLoginScreen(
 ){
     Scaffold(
         topBar = {
-            PredictionsScreenTopBar(label = "Tipster Login") {
+            UserPreferencesTopBar {
                 navigateBack()
             }
         },

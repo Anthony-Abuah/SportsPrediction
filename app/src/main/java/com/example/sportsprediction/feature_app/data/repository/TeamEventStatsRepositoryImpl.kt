@@ -5,15 +5,14 @@ import com.example.sportsprediction.core.util.*
 import com.example.sportsprediction.core.util.Constants.DoesNotExist
 import com.example.sportsprediction.core.util.Constants.HttpExceptionErrorMessage
 import com.example.sportsprediction.core.util.Constants.IO_ExceptionErrorMessage
+import com.example.sportsprediction.core.util.Constants.LoadingCompleted
 import com.example.sportsprediction.core.util.Constants.host
 import com.example.sportsprediction.core.util.Constants.key
-import com.example.sportsprediction.core.util.Functions.toDate
 import com.example.sportsprediction.feature_app.data.local.entities.event_stats.EventStatsDao
 import com.example.sportsprediction.feature_app.data.local.entities.event_stats.EventStatsEntity
-import com.example.sportsprediction.feature_app.data.local.entities.events.EventsEntity
 import com.example.sportsprediction.feature_app.data.local.entities.team_event.TeamEventDao
-import com.example.sportsprediction.feature_app.data.local.entities.team_event.TeamEventEntity
 import com.example.sportsprediction.feature_app.data.remote.SportsPredictionApi
+import com.example.sportsprediction.feature_app.domain.model.general.LoadStatsParameters
 import com.example.sportsprediction.feature_app.domain.repository.TeamEventStatsRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -425,6 +424,133 @@ class TeamEventStatsRepositoryImpl(
 
         emit(Resource.Success("Loading complete"))
 
+    }
+
+    override suspend fun loadSelectedTeamEventsStats(parameters: List<LoadStatsParameters>): Flow<Resource<String>> =flow{
+        emit(Resource.Loading())
+        parameters.forEach { parameter ->
+
+            val mainTeamId = parameter.mainTeamId
+            val mainTeamName = parameter.mainTeamName
+            val numberOfPastEvents = parameter.numberOfPastEvents
+            val numberOfHeadToHeadEvents = parameter.numberOfHeadToHeadEvents
+            val thisEventId = parameter.eventId
+            val headToHeadId = parameter.headToHeadId
+
+            val dateToLocalDate = parameter.date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
+            val dateString = Functions.shortDateFormatter.format(dateToLocalDate)
+            val localDate = LocalDate.parse(dateString, Functions.shortDateFormatter)
+            val longDate = localDate.atStartOfDay(ZoneId.systemDefault()).toInstant().epochSecond
+
+            val theNumberOfPastEvents = if (numberOfPastEvents > 10) 10 else if (numberOfPastEvents < 1) 6 else numberOfPastEvents
+            val theNumberOfHeadToHeadEvents = if (numberOfHeadToHeadEvents > 10) 10 else if (numberOfHeadToHeadEvents < 1) 4 else numberOfHeadToHeadEvents
+
+            val headToHeadEventIdsForThisTeam = teamEventDao.getThisTeamHeadToHeadEventIdsInDescendingOrder(mainTeamId, headToHeadId, longDate.toInt()) ?: emptyList()
+            val previousEventIdsForThisTeam = teamEventDao.getThisTeamEventIdsInDescendingOrder(mainTeamId, longDate.toInt())?.minus(headToHeadEventIdsForThisTeam.toSet()) ?: emptyList()
+
+            val teamNameHeadToHeadEventsIds = headToHeadEventIdsForThisTeam.toSet().toList().minus(thisEventId).take(theNumberOfHeadToHeadEvents)
+            val teamNameEventsIds = previousEventIdsForThisTeam.minus(teamNameHeadToHeadEventsIds.toSet()).minus(thisEventId).take(theNumberOfPastEvents)
+            val mergedTeamNameEventsIds = teamNameEventsIds.plus(teamNameHeadToHeadEventsIds)
+            val teamEventStatsEventIds = eventStatsDao.getThisTeamEventIds(mainTeamId) ?: emptyList()
+
+            teamNameEventsIds.forEach { eventId->
+                Log.d("eventId", "team Event Id: $eventId")
+            }
+            teamNameHeadToHeadEventsIds.forEach {eventId->
+                Log.d("eventId", "headToHead Event Id: $eventId")
+            }
+            mergedTeamNameEventsIds.forEach { eventId->
+                Log.d("eventId", "merged Team Event Id: $eventId")
+            }
+
+            Log.d("teamNameEventIds", "MarketTypeEnum: " + teamNameEventsIds.count())
+            Log.d("HeadToHeadEventIds", "MarketTypeEnum: " + teamNameHeadToHeadEventsIds.count())
+            Log.d("mergedTeamNameEventIds", "MarketTypeEnum: " + mergedTeamNameEventsIds.count())
+
+            val unwantedEventStatIds = teamEventStatsEventIds.minus(mergedTeamNameEventsIds.toSet())
+            unwantedEventStatIds.forEach{unwantedEventStatId->
+                eventStatsDao.deleteEventStatsForThisEvent(unwantedEventStatId)
+            }
+
+            try {
+
+                /*
+                * Now we are going to check if the stats for this particular eventId exists in the database
+                * If it exists, we will just keep it but if it does not, we will query the api for that particular stats
+                */
+
+                mergedTeamNameEventsIds.forEach { eventId->
+                    var loopCheck = 3
+
+                    val teamEvent = teamEventDao.getTeamEvent(eventId, mainTeamId)
+
+                    if (teamEvent != null) {
+                        val teamEventStatsEventId = eventStatsDao.getThisEventId(eventId, mainTeamId) ?: DoesNotExist
+
+                        if (teamEventStatsEventId == DoesNotExist) {
+                            do {
+                                val remoteEventStats = sportsPredictionApi.getEventStats(key, host, eventId)
+                                val currentEventStats = remoteEventStats.toEventStats()
+                                val currentTeamStatsEntity = currentEventStats.toTeamStats(
+                                    teamEvent.mainTeamName,
+                                    teamEvent.mainTeamId,
+                                    teamEvent.mainTeamPlayingLocation,
+                                    teamEvent.eventId,
+                                    teamEvent.date,
+                                    teamEvent.roundInfo,
+                                    teamEvent.tournament,
+                                    teamEvent.tournamentName,
+                                    ((teamEvent.homeScore!!.plus(teamEvent.awayScore!!)).toDouble()),
+                                    (((teamEvent.homeScores!!.period1!!).plus((teamEvent.awayScores!!.period1!!))).toDouble()),
+                                    (((teamEvent.homeScores.period2!!).plus((teamEvent.awayScores.period2!!))).toDouble()),
+                                    (((teamEvent.homeScores.period1!!).plus((teamEvent.homeScores.period2))).toDouble()),
+                                    (((teamEvent.homeScores.period1)).toDouble()),
+                                    (((teamEvent.homeScores.period2)).toDouble()),
+                                    (((teamEvent.awayScores.period1!!).plus((teamEvent.awayScores.period2))).toDouble()),
+                                    (((teamEvent.awayScores.period1)).toDouble()),
+                                    (((teamEvent.awayScores.period2)).toDouble())
+                                ).toTeamStatsEntity(
+                                    teamEvent.homeTeamName,
+                                    teamEvent.homeTeamId,
+                                    teamEvent.awayTeamName,
+                                    teamEvent.awayTeamId,
+                                    teamEvent.startTimestamp
+                                )
+                                eventStatsDao.insertThisEventStats(currentTeamStatsEntity)
+                                val thisTeamEventStatsEventId = eventStatsDao.getThisEventId(eventId) ?: DoesNotExist
+                                loopCheck -= 1
+                                if (loopCheck < 0) {
+                                    break
+                                }
+                            } while (thisTeamEventStatsEventId == DoesNotExist)
+
+                        }
+
+                    }
+
+                }
+
+            } catch (e: HttpException) {
+                emit(
+                    Resource.Error(
+                        message = "Something went wrong",
+                        data = "Couldn't load $mainTeamName's stats"
+                    )
+                )
+            } catch (e: IOException) {
+                emit(
+                    Resource.Error(
+                        message = "Couldn't connect to the server",
+                        data = "Couldn't load $mainTeamName's stats"
+                    )
+                )
+            }
+            val mainTeamEventStats = eventStatsDao.getAllOfThisTeamStats(mainTeamId)
+            if (!mainTeamEventStats.isNullOrEmpty()) {
+                emit(Resource.Loading("$mainTeamName's stats successfully loaded"))
+            }
+        }
+        emit(Resource.Success(LoadingCompleted))
     }
 
 }

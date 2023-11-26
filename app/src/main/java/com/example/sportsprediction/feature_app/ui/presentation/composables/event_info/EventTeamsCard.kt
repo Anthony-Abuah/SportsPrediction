@@ -1,61 +1,53 @@
 package com.example.sportsprediction.feature_app.ui.presentation.composables.event_info
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.sp
 import com.example.sportsprediction.R
 import com.example.sportsprediction.core.util.Constants.emptyString
 import com.example.sportsprediction.feature_app.ui.presentation.composables.components.EventTeamDateText
 import com.example.sportsprediction.feature_app.ui.presentation.composables.components.EventTeamTimeText
-import com.example.sportsprediction.feature_app.ui.presentation.composables.components.EventTeamTournamentText
 import com.example.sportsprediction.feature_app.ui.presentation.composables.components.TeamEmblemText
-import com.example.sportsprediction.feature_app.ui.theme.LocalSpacing
-import com.example.sportsprediction.feature_app.ui.theme.TeamEmblemColor
+import com.example.sportsprediction.feature_app.ui.theme.*
 
 @Composable
 fun EventTeamsCard(
+    day: String,
     date: String,
     time: String,
-    competition: String,
     homeTeam: String,
     awayTeam: String
 ) {
+    val backgroundColor = Blue10
+    val contentColor = BlueGrey90
 
     Card(
-        shape = MaterialTheme.shapes.small,
+        shape = RectangleShape,
         colors = CardDefaults.cardColors(
-            contentColor = Color.Black,
-            containerColor = Color.White,
+            contentColor = contentColor,
+            containerColor = backgroundColor,
         ),
         modifier = Modifier
             .fillMaxWidth()
             .padding(LocalSpacing.current.noPadding),
         elevation = CardDefaults.cardElevation(defaultElevation = LocalSpacing.current.noElevation)
     ) {
-        Row(horizontalArrangement = Arrangement.Start, verticalAlignment = Alignment.Top){
-            Box(modifier = Modifier.padding(LocalSpacing.current.extraSmall), contentAlignment = Alignment.Center){
-                Icon(painter = painterResource(id = R.drawable.football), contentDescription = emptyString)
-            }
-            Box(modifier = Modifier.padding(LocalSpacing.current.extraSmall), contentAlignment = Alignment.Center){
-                EventTeamTournamentText(text = competition)
-            }
-        }
-        
-        
-        Spacer(modifier = Modifier.height(LocalSpacing.current.medium))
-
         Row(modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.Bottom
         ) {
 
             Column(modifier = Modifier
@@ -72,14 +64,16 @@ fun EventTeamsCard(
                 Spacer(modifier = Modifier.height(LocalSpacing.current.smallMedium))
 
                 Box(modifier = Modifier
-                    .background(TeamEmblemColor, MaterialTheme.shapes.large)
-                    .requiredWidth(LocalSpacing.current.extraLarge)
-                    .requiredHeight(LocalSpacing.current.extraLarge),
+                    .background(MaterialTheme.colorScheme.secondaryContainer, CircleShape)
+                    .requiredWidth(LocalSpacing.current.large)
+                    .requiredHeight(LocalSpacing.current.large),
                     contentAlignment = Alignment.Center
                 ){
-                    Image(modifier = Modifier
+                    Icon(modifier = Modifier
                         .padding(LocalSpacing.current.small)
+                        .aspectRatio(1f.div(1f))
                         .fillMaxSize(),
+                        tint = MaterialTheme.colorScheme.onSecondaryContainer,
                         painter = painterResource(id = R.drawable.home),
                         contentDescription = emptyString)
                 }
@@ -87,25 +81,48 @@ fun EventTeamsCard(
 
             }
 
-            Column(modifier = Modifier.weight(1.5f),
+            Column(modifier = Modifier.weight(0.5f),
                 verticalArrangement = Arrangement.Bottom,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Spacer(modifier = Modifier.height(LocalSpacing.current.large))
+                Box(modifier = Modifier,
+                    contentAlignment = Alignment.Center
+                ){
+                    Text(
+                        text = day,
+                        fontWeight= FontWeight.SemiBold,
+                        color = contentColor,
+                        style = MaterialTheme.typography.labelMedium,
+                        textAlign = TextAlign.Center
+                    )
+                }
 
                 Box(modifier = Modifier,
                     contentAlignment = Alignment.Center
                 ){
-                    EventTeamDateText(text = date)
+                    Text(
+                        text = date,
+                        fontWeight= FontWeight.SemiBold,
+                        color = contentColor,
+                        style = MaterialTheme.typography.labelMedium,
+                        textAlign = TextAlign.Center
+                    )
                 }
+
                 Box(modifier = Modifier.padding(bottom = LocalSpacing.current.small),
                     contentAlignment = Alignment.Center
                 ){
-                    EventTeamTimeText(text = time)
+                    Text(
+                    text = time,
+                    fontWeight= FontWeight.Normal,
+                    color = contentColor,
+                    style = MaterialTheme.typography.bodySmall,
+                    textAlign = TextAlign.Center
+                )
                 }
 
-
             }
+
 
             //Away
             Column(modifier = Modifier
@@ -123,21 +140,26 @@ fun EventTeamsCard(
                 Spacer(modifier = Modifier.height(LocalSpacing.current.smallMedium))
 
                 Box(modifier = Modifier
-                    .background(TeamEmblemColor, MaterialTheme.shapes.large)
-                    .requiredWidth(LocalSpacing.current.extraLarge)
-                    .requiredHeight(LocalSpacing.current.extraLarge),
+                    .background(MaterialTheme.colorScheme.tertiaryContainer, CircleShape)
+                    .requiredWidth(LocalSpacing.current.large)
+                    .requiredHeight(LocalSpacing.current.large)
+                    .clip(CircleShape)
+                    ,
                     contentAlignment = Alignment.Center
                 ){
-                    Image(modifier = Modifier
+                    Icon(modifier = Modifier
                         .padding(LocalSpacing.current.small)
+                        .aspectRatio(1f.div(1f))
                         .fillMaxSize(),
+                        tint = MaterialTheme.colorScheme.onTertiaryContainer,
                         painter = painterResource(id = R.drawable.away),
                         contentDescription = emptyString)
                 }
             }
 
-            
         }
+
+        Spacer(modifier = Modifier.height(LocalSpacing.current.default))
     }
 
 }

@@ -7,7 +7,8 @@ import java.util.Date
 
 
 data class Post(
-    val tipster: TipsterEntity?,
+    val uniquePostId: String?,
+    val uniqueTipsterId: String?,
     val title: String?,
     val content: String?,
     val description: String?,

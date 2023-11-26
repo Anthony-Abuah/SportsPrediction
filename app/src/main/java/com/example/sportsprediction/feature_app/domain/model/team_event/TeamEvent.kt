@@ -36,9 +36,9 @@ data class TeamEvent(
     fun toTeamNameEventEntity(teamId: Int, date: Date, teamName: String): TeamEventEntity {
         return TeamEventEntity(
             null,
-            date = date ?: Date(),
-            mainTeamId = teamId ?: nullInteger,
-            mainTeamName = teamName ?: emptyString,
+            date = date,
+            mainTeamId = teamId,
+            mainTeamName = teamName,
             mainTeamPlayingLocation = if (teamId == homeTeamId) Home else if (teamId == awayTeamId) Away else Neutral,
             awayScore = awayScore ?: nullInteger,
             awayTeamName = awayTeamName ?: emptyString,

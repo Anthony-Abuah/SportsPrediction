@@ -1,390 +1,362 @@
 package com.example.sportsprediction.feature_app.ui.presentation.composables.components
 
-import androidx.compose.foundation.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Divider
-import androidx.compose.material.Icon
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.sportsprediction.core.util.Constants
+import com.example.sportsprediction.core.util.Constants.Bet_Suggestions
+import com.example.sportsprediction.core.util.Constants.Remove_All
 import com.example.sportsprediction.core.util.Constants.emptyString
+import com.example.sportsprediction.core.util.Functions.getTotalStreakPercentage
+import com.example.sportsprediction.core.util.Functions.getTotalStreaks
 import com.example.sportsprediction.feature_app.domain.model.build_a_bet.BetSuggestion
-import com.example.sportsprediction.feature_app.ui.theme.*
+import com.example.sportsprediction.feature_app.ui.theme.LocalSpacing
 
 
 @Composable
 fun BetSlip(
     closeBetSlip: () -> Unit,
     betList: List<BetSuggestion>,
-    confidenceLevel: Double,
+    mainTeamName: String,
     isLoadingConfidenceLevel: Boolean,
     removeBet: (betSuggestion: BetSuggestion) -> Unit,
     removeAllBet: () -> Unit,
     openBetSlip: () -> Unit,
 ){
-    androidx.compose.material.Card(
+    var thisBetList by remember {
+        mutableStateOf(betList)
+    }
+
+    var betIsRemoved by remember {
+        mutableStateOf(false)
+    }
+
+    Card(
         modifier = Modifier
-            //.padding(horizontal = LocalSpacing.current.default)
             .wrapContentHeight()
             .fillMaxWidth(),
-        elevation = 15.dp,
-        backgroundColor = Color.White,
-        shape = RoundedCornerShape(LocalSpacing.current.smallMedium)
+        elevation = CardDefaults.cardElevation(LocalSpacing.current.noElevation),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.background,
+            contentColor = MaterialTheme.colorScheme.onBackground
+        ),
+        shape = RectangleShape
     ) {
         val scrollState = rememberScrollState(0)
         Column(
             modifier = Modifier
-                .background(Color.Transparent)
+                .background(MaterialTheme.colorScheme.surface)
                 .fillMaxWidth()
                 .wrapContentHeight()
                 .padding(LocalSpacing.current.noPadding),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Bottom
         ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = LocalSpacing.current.noPadding)
-                    .background(PrimaryThemeColor)
-                    .clickable { closeBetSlip() },
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    imageVector = Icons.Default.KeyboardArrowDown,
-                    contentDescription = emptyString,
-                    tint = Color.White
-                )
-            }
 
             Column(modifier = Modifier
-                .background(MainBackgroundColor)
+                .background(MaterialTheme.colorScheme.primaryContainer)
                 .fillMaxWidth()
-                .wrapContentHeight()) {
-
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(LocalSpacing.current.default),
-                    contentAlignment = Alignment.Center
-                    /*,
-                    horizontalArrangement = Arrangement.Start,
-                    verticalAlignment = Alignment.CenterVertically*/
-                ) {
-                    Box(modifier = Modifier.fillMaxWidth(),
-                        contentAlignment = Alignment.CenterStart){
-                        Box(modifier = Modifier
-                            .background(PrimaryThemeColor, shape = CircleShape)
-                            .height(LocalSpacing.current.large)
-                            .width(LocalSpacing.current.large)
-                            .padding(
-                                horizontal = LocalSpacing.current.default,
-                                vertical = LocalSpacing.current.small,
-                            ),
-                            contentAlignment = Alignment.Center){
-                            SaveBetSlipText(text = "${betList.size}")
-                        }
-                    }
-                    Box(modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(LocalSpacing.current.small),
-                        contentAlignment = Alignment.Center){
-                        BetSlipTeamText(text = "Bet SuggestionVariables")
-                    }
-                }
-
+                .wrapContentHeight()
+            ) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = LocalSpacing.current.default),
+                        .padding(LocalSpacing.current.default),
                     horizontalArrangement = Arrangement.Start,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
+                    Box(modifier = Modifier
+                        .requiredWidth(LocalSpacing.current.large)
+                        .requiredHeight(LocalSpacing.current.large)
+                        .background(
+                            MaterialTheme.colorScheme.tertiaryContainer,
+                            shape = CircleShape
+                        )
+                        .padding(LocalSpacing.current.small)
+                        //.wrapContentSize()
+                        .aspectRatio(1f / 1f),
+                        contentAlignment = Alignment.Center
+                    ){
+                        val betListSize = "${thisBetList.size}"
+                        Text(
+                            text = betListSize,
+                            fontWeight= FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onTertiaryContainer,
+                            style = MaterialTheme.typography.labelMedium,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                    Box(modifier = Modifier
+                        .weight(Bet_Suggestions.length.toFloat())
+                        .padding(LocalSpacing.current.small),
+                        contentAlignment = Alignment.Center){
+                        Text(
+                            text = Bet_Suggestions,
+                            fontWeight= FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer,
+                            style = MaterialTheme.typography.titleMedium,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+
                     Row(modifier = Modifier
-                        .weight(1f)
+                        .weight(Remove_All.length.toFloat())
                         .padding(LocalSpacing.current.default),
-                        horizontalArrangement = Arrangement.Start,
+                        horizontalArrangement = Arrangement.End,
                         verticalAlignment = Alignment.CenterVertically,
                     ){
                         Box(modifier = Modifier
-                            .clickable {
-                                removeAllBet()
-                                closeBetSlip()
-                                openBetSlip()
-                            },
-                            contentAlignment = Alignment.Center){
+                            .clickable { removeAllBet() },
+                            contentAlignment = Alignment.Center
+                        ){
                             Icon(
                                 modifier = Modifier
                                     .height(LocalSpacing.current.semiLarge)
                                     .width(LocalSpacing.current.semiLarge),
                                 imageVector = Icons.Default.Delete,
                                 contentDescription = emptyString,
-                                tint = Color.Red
+                                tint = MaterialTheme.colorScheme.error
                             )
                         }
                         Box(modifier = Modifier
-                            .padding(horizontal = LocalSpacing.current.small)
-                            .clickable {
-                                removeAllBet()
-                                closeBetSlip()
-                                openBetSlip()
-                            },
-                            contentAlignment = Alignment.Center){
-                            BasicText(text = "Remove All", fontSize = 14.sp, textColor = Color.Red)
-                        }
-
-                    }
-
-                    Row(modifier = Modifier
-                        .weight(1f)
-                        .padding(LocalSpacing.current.default),
-                        horizontalArrangement = Arrangement.End,
-                        verticalAlignment = Alignment.CenterVertically,
-                    ){
-                        Box(modifier = Modifier.background(Color.White, shape = CircleShape),
-                            contentAlignment = Alignment.Center){
-                            Icon(
-                                imageVector = Icons.Default.Settings,
-                                contentDescription = emptyString,
-                                tint = Color.Black
+                            //.padding(horizontal = LocalSpacing.current.small)
+                            .clickable { removeAllBet() },
+                            contentAlignment = Alignment.Center
+                        ){
+                            Text(
+                                text = Remove_All,
+                                fontWeight= FontWeight.Normal,
+                                color = MaterialTheme.colorScheme.error,
+                                style = MaterialTheme.typography.bodyMedium,
+                                textAlign = TextAlign.Start
                             )
                         }
-                        Box(modifier = Modifier.padding(horizontal = LocalSpacing.current.small),
-                            contentAlignment = Alignment.Center){
-                            BasicText(text = "Bet Settings", fontSize = 14.sp, textColor = Color.Black)
-                        }
-
                     }
                 }
-
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(MainBackgroundColor)
-                        .height(LocalSpacing.current.topAppBarSize)
-                        .padding(horizontal = LocalSpacing.current.default),
-                    horizontalArrangement = Arrangement.Start,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Row(modifier = Modifier
-                        .weight(1f)
-                        .fillMaxHeight()
-                        .padding(LocalSpacing.current.small)
-                        .background(
-                            PrimaryThemeColor,
-                            shape = RoundedCornerShape(LocalSpacing.current.small)
-                        ),
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically,
-                    ){
-                        Box(modifier = Modifier
-                            .fillMaxHeight()
-                            .padding(horizontal = LocalSpacing.current.small),
-                            contentAlignment = Alignment.Center){
-                            BasicText(text = "Single Event", fontSize = 18.sp, textColor = Color.White)
-                        }
-
-                    }
-                    Row(modifier = Modifier
-                        .weight(1f)
-                        .fillMaxHeight()
-                        .padding(LocalSpacing.current.small)
-                        .background(
-                            BetorsConfidenceBackground,
-                            shape = RoundedCornerShape(LocalSpacing.current.small)
-                        ),
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically,
-                    ){
-                        Box(modifier = Modifier
-                            .fillMaxHeight()
-                            .padding(horizontal = LocalSpacing.current.small),
-                            contentAlignment = Alignment.Center){
-                            BasicText(text = "Multi Events", fontSize = 18.sp, textColor = Color.Black)
-                        }
-
-                    }
-
-                }
-
 
             }
 
-
-
-            //Divider()
-
             Column(
                 modifier = Modifier
-                    .wrapContentHeight()
+                    .heightIn(min = LocalSpacing.current.small, max = 400.dp)
                     .verticalScroll(state = scrollState, enabled = true),
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-
-                betList.forEach { betSuggestion ->
-                    BetSlipCard(
-                        mainTeamName = betSuggestion.mainTeamName ?: emptyString,
-                        opposingTeamName = betSuggestion.opposingTeamName ?: emptyString,
-                        playingLocation = betSuggestion.mainTeamPlayingLocation ?: Constants.Home,
-                        marketName = betSuggestion.marketName ?: emptyString,
-                        numerator = betSuggestion.numerator ?: "0",
-                        denominator = betSuggestion.denominator ?: "1",
-                        removeBet = { removeBet(betSuggestion) },
-                        openBetSlip = openBetSlip,
-                        closeBetSlip = closeBetSlip
-                    )
-                    Divider()
+                if (betIsRemoved){
+                    thisBetList = betList
+                    betIsRemoved = false
                 }
-
-
-                Column(modifier = Modifier.background(MainBackgroundColor),
-                    horizontalAlignment = Alignment.Start,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    var totalNumerator: Double =  0.0
-                    var totalDenominator: Double =  0.0
-                    betList.forEach { betBuilder ->
-                        val numerator = betBuilder.numerator?.toDouble() ?: 0.0
-                        val denominator = betBuilder.denominator?.toDouble() ?: 0.0
-                        totalNumerator += numerator
-                        totalDenominator += denominator
-                    }
-
-                    Row(modifier = Modifier
-                        //.background(DateEventHeaderBackgroundColor, shape = RoundedCornerShape(LocalSpacing.current.default))
-                        .padding(LocalSpacing.current.small)
-                        .height(LocalSpacing.current.topAppBarSize)
-                        .fillMaxWidth(),
-                        horizontalArrangement = Arrangement.Start,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Row(
-                            modifier = Modifier
-                                .padding(horizontal = LocalSpacing.current.small)
-                                .weight(1f),
-                            horizontalArrangement = Arrangement.Start,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                modifier = Modifier
-                                    .width(LocalSpacing.current.semiLarge)
-                                    .height(LocalSpacing.current.semiLarge),
-                                imageVector = Icons.Filled.Info,
-                                contentDescription = emptyString,
-                                tint = Color.Gray
-                            )
-                            Spacer(modifier = Modifier.width(LocalSpacing.current.small))
-                            BasicText(
-                                text = "Average streak is ${(totalNumerator.div(totalDenominator)).times(100.0).toString().take(4)}% (${totalNumerator.toInt()} out of ${totalDenominator.toInt()} matches)",
-                                fontSize = 15.sp,
-                                textColor = Color.Black
-                            )
-                        }
-
-                    }
-
-                    Row(modifier = Modifier
-                        .padding(LocalSpacing.current.small)
-                        .background(
-                            BetorsConfidenceBackground,
-                            shape = RoundedCornerShape(LocalSpacing.current.small)
+                if (thisBetList.isEmpty()) {
+                    closeBetSlip()
+                }
+                else {
+                    thisBetList.forEach { betSuggestion ->
+                        BetSlipCard(
+                            mainTeamName = betSuggestion.mainTeamName ?: emptyString,
+                            opposingTeamName = betSuggestion.opposingTeamName ?: emptyString,
+                            playingLocation = betSuggestion.mainTeamPlayingLocation ?: Constants.Home,
+                            marketName = betSuggestion.marketName ?: emptyString,
+                            numerator = betSuggestion.numerator ?: "0",
+                            denominator = betSuggestion.denominator ?: "1",
+                            removeBet = {
+                                betIsRemoved = true
+                                removeBet(betSuggestion)
+                            },
+                            openBetSlip = openBetSlip,
+                            closeBetSlip = closeBetSlip
                         )
-                        .fillMaxWidth()
-                        .height(LocalSpacing.current.topAppBarSize),
-                        horizontalArrangement = Arrangement.Start,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Row(modifier = Modifier
-                            .weight(4f)
-                            .fillMaxHeight()
-                            .padding(horizontal = LocalSpacing.current.default),
-                            horizontalArrangement = Arrangement.Start,
-                            verticalAlignment = Alignment.CenterVertically
-                        ){
-                            Icon(modifier = Modifier
-                                .width(LocalSpacing.current.semiLarge)
-                                .height(LocalSpacing.current.semiLarge),
-                                imageVector = Icons.Default.Info,
-                                contentDescription = emptyString,
-                                tint = Color.Gray)
-
-                            Spacer(modifier = Modifier.width(LocalSpacing.current.small))
-
-                            BasicText(
-                                text = "Betor's Confidence Probability",
-                                fontSize = 16.sp,
-                                textColor = Color.Black
-                            )
-                        }
-
-                        Box(modifier = Modifier
-                            .padding(horizontal = LocalSpacing.current.default)
-                            .weight(1f)
-                            .fillMaxHeight(),
-                            contentAlignment = Alignment.CenterEnd){
-                            if(isLoadingConfidenceLevel)
-                                CircularProgressIndicator(color = MainBackgroundColor)
-                            else BasicText(
-                                text = "${confidenceLevel.toString().take(5)} %",
-                                fontSize = 16.sp,
-                                textColor = Color.Black
-                            )
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(LocalSpacing.current.small))
-
-                    Row(modifier = Modifier
-                        .background(MainBackgroundColor)
-                        .fillMaxWidth()
-                        .height(LocalSpacing.current.topAppBarSize)
-                    ) {
-                        Row(modifier = Modifier
-                            .background(SelectedTabColor)
-                            .fillMaxHeight()
-                            //.padding(LocalSpacing.current.small)
-                            .weight(1.5f),
-                            horizontalArrangement = Arrangement.Center,
-                            verticalAlignment = Alignment.CenterVertically
-                        ){
-                            SaveBetSlipText(text = "Save SuggestionVariables")
-                        }
-
-                        Row(modifier = Modifier
-                            .background(TabRowBackgroundColor)
-                            .fillMaxHeight()
-                            //.padding(LocalSpacing.current.small)
-                            .weight(1f),
-                            horizontalArrangement = Arrangement.Center,
-                            verticalAlignment = Alignment.CenterVertically
-                        ){
-                            Icon(modifier = Modifier.padding(LocalSpacing.current.small),
-                                imageVector = Icons.Default.Share,
-                                contentDescription = emptyString,
-                                tint = Color.White)
-                            SaveBetSlipText(text = "Share")
-                        }
-
+                        Divider(
+                            thickness = LocalSpacing.current.thinBorder,
+                            color = MaterialTheme.colorScheme.onBackground
+                        )
                     }
                 }
 
             }
 
-            //Spacer(modifier = Modifier.height(LocalSpacing.current.default))
+
+            Column(modifier = Modifier.background(MaterialTheme.colorScheme.background),
+                horizontalAlignment = Alignment.Start,
+                verticalArrangement = Arrangement.Center
+            ) {
+
+                Row(modifier = Modifier
+                    .padding(LocalSpacing.current.small)
+                    .height(LocalSpacing.current.topAppBarSize)
+                    .fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Start,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .padding(horizontal = LocalSpacing.current.small)
+                            .weight(1f),
+                        horizontalArrangement = Arrangement.Start,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            modifier = Modifier
+                                .width(LocalSpacing.current.semiLarge)
+                                .height(LocalSpacing.current.semiLarge),
+                            imageVector = Icons.Filled.Info,
+                            contentDescription = emptyString,
+                            tint = Color.Gray
+                        )
+                        Spacer(modifier = Modifier.width(LocalSpacing.current.small))
+                        val totalNumerator =  getTotalStreaks(betList).first()
+                        val totalDenominator =  getTotalStreaks(betList).last()
+                        val totalStreakPercentage =  getTotalStreakPercentage(betList)
+                        Text(
+                            modifier = Modifier
+                                .wrapContentWidth(align = Alignment.Start)
+                                .padding(LocalSpacing.current.small),
+                            text = "Total streak",
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.onBackground,
+                            style = MaterialTheme.typography.bodyMedium,
+                            maxLines = 2
+                        )
+                        Text(
+                            modifier = Modifier
+                                .weight(1f)
+                                .padding(LocalSpacing.current.small),
+                            text = "$totalNumerator out of $totalDenominator ($totalStreakPercentage%)",
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.onBackground,
+                            style = MaterialTheme.typography.bodyMedium,
+                            textAlign = TextAlign.End,
+                            maxLines = 2
+                        )
+                    }
+
+                }
+
+                Row(modifier = Modifier
+                    .padding(LocalSpacing.current.small)
+                    .background(
+                        MaterialTheme.colorScheme.primaryContainer,
+                        MaterialTheme.shapes.small
+                    )
+                    .fillMaxWidth()
+                    .height(LocalSpacing.current.topAppBarSize),
+                    horizontalArrangement = Arrangement.Start,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(modifier = Modifier
+                        .weight(4f)
+                        .fillMaxHeight()
+                        .padding(start = LocalSpacing.current.default, end = LocalSpacing.current.small),
+                        horizontalArrangement = Arrangement.Start,
+                        verticalAlignment = Alignment.CenterVertically
+                    ){
+                        Icon(modifier = Modifier
+                            .width(LocalSpacing.current.semiLarge)
+                            .height(LocalSpacing.current.semiLarge),
+                            imageVector = Icons.Default.Info,
+                            contentDescription = emptyString,
+                            tint = Color.Gray)
+
+                        Spacer(modifier = Modifier.width(LocalSpacing.current.small))
+
+                        Text(
+                            modifier = Modifier
+                                .wrapContentWidth(align = Alignment.Start)
+                                .padding(LocalSpacing.current.small),
+                            text = "$mainTeamName win probability",
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer,
+                            style = MaterialTheme.typography.bodyMedium,
+                            maxLines = 2
+                        )
+                        Box(modifier = Modifier
+                            .padding(horizontal = LocalSpacing.current.small)
+                            .weight(1f)
+                            .fillMaxHeight(),
+                            contentAlignment = Alignment.CenterEnd){
+                            if(isLoadingConfidenceLevel) CircularProgressIndicator(color = MaterialTheme.colorScheme.onPrimaryContainer)
+                            else Text(
+                                text = "55.5%",
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                style = MaterialTheme.typography.bodyMedium,
+                                textAlign = TextAlign.End,
+                                maxLines = 2
+                            )
+                        }
+                    }
 
 
+                }
 
+                Spacer(modifier = Modifier.height(LocalSpacing.current.small))
+
+                Row(modifier = Modifier
+                    .background(MaterialTheme.colorScheme.primaryContainer)
+                    .fillMaxWidth()
+                    .height(LocalSpacing.current.topAppBarSize),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(modifier = Modifier
+                        //.background(MaterialTheme.colorScheme.secondaryContainer)
+                        .fillMaxHeight()
+                        .weight(1.5f),
+                    contentAlignment = Alignment.Center) {
+                        Text(
+                            modifier = Modifier,
+                            text = "Save Suggestions",
+                            fontWeight = FontWeight.SemiBold,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer,
+                            style = MaterialTheme.typography.bodyLarge,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+
+                    Row(modifier = Modifier
+                        .background(MaterialTheme.colorScheme.inversePrimary)
+                        .fillMaxHeight()
+                        .weight(1f),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ){
+                        Icon(modifier = Modifier.padding(LocalSpacing.current.small),
+                            imageVector = Icons.Default.Share,
+                            contentDescription = emptyString,
+                            tint = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
+                        Box(modifier = Modifier
+                            .fillMaxHeight(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                modifier = Modifier.padding(horizontal = LocalSpacing.current.small),
+                                text = "Share",
+                                fontWeight = FontWeight.SemiBold,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                style = MaterialTheme.typography.bodyLarge,
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                    }
+                }
+            }
         }
     }
 }

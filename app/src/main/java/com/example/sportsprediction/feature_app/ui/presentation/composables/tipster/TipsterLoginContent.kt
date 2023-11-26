@@ -140,7 +140,7 @@ fun TipsterLoginContent(
             .padding(LocalSpacing.current.large),
             contentAlignment = Alignment.Center
         ) {
-            RegisterTipsterButton(buttonName = "Register") {}
+            RegisterTipsterButton(buttonName = "Register", isLoading = false,) {}
         }
 
 

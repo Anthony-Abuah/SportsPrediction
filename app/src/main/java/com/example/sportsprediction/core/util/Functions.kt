@@ -13,10 +13,13 @@ import com.example.sportsprediction.core.util.Constants.NotAvailable
 import com.example.sportsprediction.core.util.Constants.Offsides
 import com.example.sportsprediction.core.util.Constants.Shots_On_Target
 import com.example.sportsprediction.core.util.Constants.Total_Shots
+import com.example.sportsprediction.core.util.Constants.UnknownCountry
 import com.example.sportsprediction.core.util.Constants.WinValue
 import com.example.sportsprediction.core.util.Constants.Yellow_Cards
+import com.example.sportsprediction.core.util.Constants.countries
 import com.example.sportsprediction.core.util.Constants.emptyString
 import com.example.sportsprediction.core.util.Constants.first_Half
+import com.example.sportsprediction.core.util.Constants.longDateFormat
 import com.example.sportsprediction.core.util.Constants.nullDouble
 import com.example.sportsprediction.core.util.Constants.second_Half
 import com.example.sportsprediction.core.util.Constants.shortDateFormat
@@ -67,15 +70,56 @@ import com.example.sportsprediction.core.util.SuggestionVariables.draw
 import com.example.sportsprediction.core.util.SuggestionVariables.lose
 import com.example.sportsprediction.core.util.SuggestionVariables.win
 import com.example.sportsprediction.feature_app.data.local.entities.event_stats.EventStatsEntity
+import com.example.sportsprediction.feature_app.data.local.entities.events.EventsEntity
+import com.example.sportsprediction.feature_app.domain.model.build_a_bet.BetSuggestion
+import com.example.sportsprediction.feature_app.ui.theme.*
+import java.time.Instant
 import java.time.LocalDate
+import java.time.LocalTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.*
+import kotlin.math.roundToInt
 
 object Functions {
 
     fun LocalDate.toDate(): Date = Date.from(this.atStartOfDay(ZoneId.systemDefault()).toInstant())
     val shortDateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern(shortDateFormat)!!
+    val longDateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern(longDateFormat)!!
+
+    fun Long.toTimeStampString(): String = DateTimeFormatter.ISO_INSTANT.format(this.let { Instant.ofEpochSecond(it) })
+    fun Int.toTimeStampString(): String = DateTimeFormatter.ISO_INSTANT.format(this.let { Instant.ofEpochSecond(it.toLong()) })
+
+    fun String.fromTimeStampToLocalDate(): LocalDate = LocalDate.parse(this, longDateFormatter)
+    fun String.fromTimeStampToLocalTime(): LocalTime = LocalTime.parse(this, longDateFormatter)
+
+    fun String?.orUnknownCountry(): String = this ?: UnknownCountry
+    fun String?.toNotNull(): String = this ?: emptyString
+    fun Double?.toNotNull(): Double = this ?: 0.0
+    fun Double?.toRoundedInt(): Int = if (this?.isNaN() == true) 0 else this?.roundToInt() ?: 0
+    fun Int?.toNotNull(): Int = this ?: 0
+    fun Map<String, List<EventsEntity>>.toEventsEntityList(): List<EventsEntity>{
+        val eventEntities = mutableListOf<EventsEntity>()
+        this.forEach { (key, _) ->
+            this[key]?.let { eventEntities.addAll(it) }
+        }
+        return eventEntities
+    }
+
+
+    fun Date.toLocalDate(): LocalDate = this.toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
+
+    fun String.toLocalDate(): LocalDate = LocalDate.parse(this, shortDateFormatter)
+
+    fun LocalDate.toDateString(): String = shortDateFormatter.format(this)
+
+    fun Date.toDateString(): String = this.toLocalDate().toDateString()
+
+    fun Date?.toTimestamp(): Long = this?.time ?: 0
+
+    fun LocalDate?.toTimestamp(): Long = this?.toDate()?.toTimestamp() ?: 0
+
+    fun Double.toTwoDecimalPlaces(): Double = if(this.isNaN()) 0.0 else (this * 100.0).roundToInt() / 100.0
 
     fun getEventStatsValues(eventStats: EventStatsEntity, period: String, location: String, marketName: String): String{
         return when(period){
@@ -258,16 +302,31 @@ object Functions {
         else nullDouble
     }
 
-    fun getResultBackgroundColor(result: Double): Color {
+    fun getResultBackgroundColor(result: Double, isDarkTheme: Boolean): Color {
         return when (result) {
             WinValue -> {
-                Color.Green
+                if (isDarkTheme) green50 else green40
             }
             LoseValue -> {
-                Color.Red
+                if (isDarkTheme) Red40 else Red60
             }
             else -> {
-                Color.Gray
+                if (isDarkTheme) Grey40 else Grey40
+            }
+        }
+    }
+
+    fun getResultContentColor(result: Double, isDarkTheme: Boolean): Color {
+        return when (result) {
+            WinValue -> {
+                //if (isDarkTheme) green10 else green90
+                green90
+            }
+            LoseValue -> {
+                Red90
+            }
+            else -> {
+                Grey90
             }
         }
     }
@@ -281,6 +340,18 @@ object Functions {
             }
         }
         return duplicates
+    }
+
+    fun getTotalStreakPercentage(betList: List<BetSuggestion>): String {
+        val totalNumerator = betList.sumOf { it.numerator?.toDouble() ?: 0.0 }
+        val totalDenominator = betList.sumOf { it.denominator?.toDouble() ?: 0.0 }
+        return (totalNumerator.div(totalDenominator).times(100.0)).toString().take(5)
+    }
+
+    fun getTotalStreaks(betList: List<BetSuggestion>) : List<String> {
+        val totalNumerator = betList.sumOf { it.numerator?.toDouble()?.toInt() ?: 0 }
+        val totalDenominator = betList.sumOf { it.denominator?.toDouble()?.toInt() ?: 0 }
+        return listOf(totalNumerator.toString(), totalDenominator.toString())
     }
 
     fun getFormFactor(winningProbability: Double, form: Double): Double{
@@ -903,5 +974,19 @@ object Functions {
         }
         return scores
     }
+
+
+    fun getCountryCode(country: String, countryCodes: List<String>): String{
+        var returnedString = emptyString
+        countries.forEachIndexed{index, _countryCode->
+            if (country == _countryCode) {
+                returnedString = countryCodes[index]
+            }
+        }
+        return returnedString
+    }
+
+
+
 
 }

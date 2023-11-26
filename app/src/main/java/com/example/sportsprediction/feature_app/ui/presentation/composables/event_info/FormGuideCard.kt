@@ -1,29 +1,33 @@
 package com.example.sportsprediction.feature_app.ui.presentation.composables.event_info
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.sportsprediction.R
 import com.example.sportsprediction.core.util.Constants
+import com.example.sportsprediction.core.util.Constants.Form
 import com.example.sportsprediction.core.util.Constants.FormGuide
-import com.example.sportsprediction.core.util.Functions.getResultBackgroundColor
+import com.example.sportsprediction.core.util.Constants.Remarks
+import com.example.sportsprediction.core.util.Constants.Team
+import com.example.sportsprediction.core.util.Constants.emptyString
 import com.example.sportsprediction.core.util.Functions.getMatchResult
 import com.example.sportsprediction.core.util.Functions.getResult
+import com.example.sportsprediction.core.util.Functions.getResultBackgroundColor
+import com.example.sportsprediction.core.util.Functions.getResultContentColor
 import com.example.sportsprediction.feature_app.data.local.entities.team_event.TeamEventEntity
-import com.example.sportsprediction.feature_app.ui.presentation.composables.components.FormGuideRemarksText
+import com.example.sportsprediction.feature_app.ui.presentation.composables.components.FormCardHeaderText
 import com.example.sportsprediction.feature_app.ui.presentation.composables.components.FormGuideTeamNameText
-import com.example.sportsprediction.feature_app.ui.presentation.composables.components.FormGuideText
-import com.example.sportsprediction.feature_app.ui.presentation.composables.components.FormGuideTitleText
 import com.example.sportsprediction.feature_app.ui.theme.*
 import java.util.*
 
@@ -39,8 +43,8 @@ fun FormGuideCard(
     Card(
         shape = MaterialTheme.shapes.large,
         colors = CardDefaults.cardColors(
-            contentColor = Color.Black,
-            containerColor = MainBackgroundColor,
+            contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+            containerColor = MaterialTheme.colorScheme.secondaryContainer,
         ),
         modifier = Modifier
             .fillMaxWidth()
@@ -50,14 +54,14 @@ fun FormGuideCard(
     ) {
 
         // Title
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                FormGuideText(text = FormGuide)
-            }
+        Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+            Text(
+                text = FormGuide,
+                fontWeight= FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary,
+                style = MaterialTheme.typography.bodySmall,
+                textAlign = TextAlign.Center
+            )
         }
 
         Spacer(modifier = Modifier.height(LocalSpacing.current.medium))
@@ -72,7 +76,7 @@ fun FormGuideCard(
                 verticalArrangement = Arrangement.Center
             ) {
                 Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.TopCenter) {
-                    FormGuideTitleText(text = "Team")
+                    FormCardHeaderText(text = Team)
                 }
 
                 Column(
@@ -81,25 +85,25 @@ fun FormGuideCard(
                     verticalArrangement = Arrangement.Center
                 ) {
                     //Default Team Emblem
-                    Box(
-                        modifier = Modifier
-                            .background(TeamEmblemColor, MaterialTheme.shapes.large)
-                            .requiredWidth(LocalSpacing.current.large)
-                            .requiredHeight(LocalSpacing.current.large),
+                    Box(modifier = Modifier
+                        .background(MaterialTheme.colorScheme.primaryContainer, CircleShape)
+                        .requiredWidth(LocalSpacing.current.large)
+                        .requiredHeight(LocalSpacing.current.large),
                         contentAlignment = Alignment.Center
-                    ) {
-                        Image(
-                            modifier = Modifier
-                                .padding(LocalSpacing.current.small)
-                                .fillMaxSize(),
+                    ){
+                        Icon(modifier = Modifier
+                            .padding(LocalSpacing.current.small)
+                            .aspectRatio(1f.div(1f))
+                            .fillMaxSize(),
+                            tint = MaterialTheme.colorScheme.onPrimaryContainer,
                             painter = painterResource(id = R.drawable.home),
-                            contentDescription = Constants.emptyString
+                            contentDescription = emptyString
                         )
                     }
                     Spacer(modifier = Modifier.height(LocalSpacing.current.small))
 
                     // Default Team Name
-                    Box(modifier = Modifier, contentAlignment = Alignment.Center) {
+                    Box(modifier = Modifier.padding(LocalSpacing.current.extraSmall), contentAlignment = Alignment.Center) {
                         FormGuideTeamNameText(text = homeTeam)
                     }
                 }
@@ -110,26 +114,26 @@ fun FormGuideCard(
                     verticalArrangement = Arrangement.Center
                 ) {
                     // Away Team Emblem
-                    Box(
-                        modifier = Modifier
-                            .background(TeamEmblemColor, MaterialTheme.shapes.large)
-                            .requiredWidth(LocalSpacing.current.large)
-                            .requiredHeight(LocalSpacing.current.large),
+                    Box(modifier = Modifier
+                        .background(MaterialTheme.colorScheme.tertiaryContainer, CircleShape)
+                        .requiredWidth(LocalSpacing.current.large)
+                        .requiredHeight(LocalSpacing.current.large),
                         contentAlignment = Alignment.Center
-                    ) {
-                        Image(
-                            modifier = Modifier
-                                .padding(LocalSpacing.current.small)
-                                .fillMaxSize(),
+                    ){
+                        Icon(modifier = Modifier
+                            .padding(LocalSpacing.current.small)
+                            .aspectRatio(1f.div(1f))
+                            .fillMaxSize(),
+                            tint = MaterialTheme.colorScheme.onTertiaryContainer,
                             painter = painterResource(id = R.drawable.away),
-                            contentDescription = Constants.emptyString
+                            contentDescription = emptyString
                         )
                     }
 
                     Spacer(modifier = Modifier.height(LocalSpacing.current.small))
 
                     // Away Team Name
-                    Box(modifier = Modifier, contentAlignment = Alignment.Center) {
+                    Box(modifier = Modifier.padding(LocalSpacing.current.extraSmall), contentAlignment = Alignment.Center) {
                         FormGuideTeamNameText(text = awayTeam)
                     }
                 }
@@ -143,7 +147,7 @@ fun FormGuideCard(
                 verticalArrangement = Arrangement.Center
             ) {
                 Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.TopCenter) {
-                    FormGuideTitleText(text = "Form")
+                    FormCardHeaderText(text = Form)
                 }
 
                 Box(modifier = Modifier.weight(3f), contentAlignment = Alignment.Center) {
@@ -154,35 +158,42 @@ fun FormGuideCard(
                             .background(Color.Transparent, MaterialTheme.shapes.medium)
                             .padding(LocalSpacing.current.noPadding)
                     ) {
-                        for (teamNameEvent in homeTeamEvents.take(5)) {
+                        homeTeamEvents.take(5).forEach {teamNameEvent->
                             val result = getMatchResult(
                                 teamNameEvent.mainTeamPlayingLocation,
                                 teamNameEvent.homeScore,
                                 teamNameEvent.awayScore
                             )
 
-                            Box(
+                            Card(
                                 modifier = Modifier
                                     .fillMaxHeight()
-                                    .padding(
-                                        start = LocalSpacing.current.borderStroke,
-                                        end = LocalSpacing.current.borderStroke
-                                    )
+                                    .padding(horizontal = LocalSpacing.current.borderStroke)
                                     .background(
-                                        getResultBackgroundColor(result),
+                                        getResultBackgroundColor(result, isSystemInDarkTheme()),
                                         MaterialTheme.shapes.medium
                                     )
                                     .weight(1f),
-                                contentAlignment = Alignment.Center
+                                colors = CardDefaults.cardColors(
+                                    containerColor = getResultBackgroundColor(result, isSystemInDarkTheme()),
+                                    contentColor = getResultContentColor(result, isSystemInDarkTheme())
+                                ),
+                                elevation = CardDefaults.cardElevation(LocalSpacing.current.small)
                             ) {
-                                Text(
-                                    modifier = Modifier.padding(
-                                        start = LocalSpacing.current.extraSmall,
-                                        end = LocalSpacing.current.extraSmall
-                                    ),
-                                    text = getResult(result).uppercase(Locale.ROOT).take(1),
-                                    style = MaterialTheme.typography.h6
-                                )
+                                Box(modifier = Modifier.fillMaxSize(),
+                                    contentAlignment = Alignment.Center) {
+                                    Text(
+                                        modifier = Modifier.padding(LocalSpacing.current.extraSmall),
+                                        text = getResult(result).uppercase(Locale.ROOT).take(1),
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = getResultContentColor(
+                                            result,
+                                            isSystemInDarkTheme()
+                                        ),
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        textAlign = TextAlign.Center
+                                    )
+                                }
                             }
 
                         }
@@ -197,7 +208,7 @@ fun FormGuideCard(
                             .background(Color.Transparent, MaterialTheme.shapes.medium)
                             .padding(LocalSpacing.current.noPadding)
                     ) {
-                        for (teamNameEvent in awayTeamEvents.take(5)) {
+                        awayTeamEvents.take(5).forEach {teamNameEvent->
                             if (teamNameEvent.homeScore != null || teamNameEvent.awayScore != null) {
 
                                 val result = getMatchResult(
@@ -205,29 +216,38 @@ fun FormGuideCard(
                                     teamNameEvent.homeScore,
                                     teamNameEvent.awayScore
                                 )
-                                Box(
+
+                                Card(
                                     modifier = Modifier
                                         .fillMaxHeight()
-                                        .padding(
-                                            start = LocalSpacing.current.borderStroke,
-                                            end = LocalSpacing.current.borderStroke
-                                        )
+                                        .padding(horizontal = LocalSpacing.current.borderStroke)
                                         .background(
-                                            getResultBackgroundColor(result),
+                                            getResultBackgroundColor(result, isSystemInDarkTheme()),
                                             MaterialTheme.shapes.medium
                                         )
                                         .weight(1f),
-                                    contentAlignment = Alignment.Center
+                                    colors = CardDefaults.cardColors(
+                                        containerColor = getResultBackgroundColor(result, isSystemInDarkTheme()),
+                                        contentColor = getResultContentColor(result, isSystemInDarkTheme())
+                                    ),
+                                    elevation = CardDefaults.cardElevation(LocalSpacing.current.small)
                                 ) {
-                                    Text(
-                                        modifier = Modifier.padding(
-                                            start = LocalSpacing.current.extraSmall,
-                                            end = LocalSpacing.current.extraSmall
-                                        ),
-                                        text = getResult(result).take(1).uppercase(Locale.ROOT),
-                                        style = MaterialTheme.typography.h6
-                                    )
+                                    Box(modifier = Modifier.fillMaxSize(),
+                                        contentAlignment = Alignment.Center) {
+                                        Text(
+                                            modifier = Modifier.padding(LocalSpacing.current.extraSmall),
+                                            text = getResult(result).uppercase(Locale.ROOT).take(1),
+                                            fontWeight = FontWeight.SemiBold,
+                                            color = getResultContentColor(
+                                                result,
+                                                isSystemInDarkTheme()
+                                            ),
+                                            style = MaterialTheme.typography.bodyMedium,
+                                            textAlign = TextAlign.Center
+                                        )
+                                    }
                                 }
+
                             }
                         }
                     }
@@ -242,7 +262,7 @@ fun FormGuideCard(
                 verticalArrangement = Arrangement.Center
             ) {
                 Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.Center) {
-                    FormGuideTitleText(text = "Remarks")
+                    FormCardHeaderText(text = Remarks)
                 }
 
                 Box(modifier = Modifier.weight(3f), contentAlignment = Alignment.Center) {
@@ -254,20 +274,37 @@ fun FormGuideCard(
                             .padding(LocalSpacing.current.noPadding)
                     ) {
                         val form: Double = homeFormPercentage
+                        val thisForm: Int = try {
+                            form.toInt()
+                        }catch (e: java.lang.Exception){
+                            0
+                        }
+
                         Box(
-                            modifier = Modifier.fillMaxHeight().background(
-                                color = if (form > 90.0) green1
-                                else if (form > 80.0) green2
-                                else if (form > 70.0) green3
-                                else if (form > 60.0) green4
-                                else if (form > 50.0) green5
-                                else if (form > 40.0) Color.Gray
-                                else Color.Red,
-                                shape = MaterialTheme.shapes.medium
-                            ).padding(LocalSpacing.current.extraSmall),
+                            modifier = Modifier
+                                .fillMaxHeight()
+                                .background(
+                                    color = when (thisForm in 0..100) {
+                                        (thisForm in 60..100) -> if (isSystemInDarkTheme()) green50 else green40
+                                        (thisForm in 30..59) -> if (isSystemInDarkTheme()) Grey40 else Grey40
+                                        else -> if (isSystemInDarkTheme()) Red40 else Red60
+                                    },
+                                    shape = MaterialTheme.shapes.medium
+                                )
+                                .padding(LocalSpacing.current.extraSmall),
                             contentAlignment = Alignment.Center
                         ) {
-                            FormGuideRemarksText(text = "${form.toString().take(5)}%")
+                            Text(
+                                text = "${form.toString().take(5)}%",
+                                fontWeight= FontWeight.SemiBold,
+                                color = when (thisForm in 0..100) {
+                                    (thisForm in 60..100) -> green90
+                                    (thisForm in 30..59) -> Grey90
+                                    else -> Red90
+                                },
+                                style = MaterialTheme.typography.bodyMedium,
+                                textAlign = TextAlign.Center
+                            )
                         }
 
                     }
@@ -282,20 +319,36 @@ fun FormGuideCard(
                             .padding(LocalSpacing.current.noPadding)
                     ) {
                         val form: Double = awayFormPercentage
+                        val thisForm: Int = try {
+                            form.toInt()
+                        }catch (e: java.lang.Exception){
+                            0
+                        }
                         Box(
-                            modifier = Modifier.fillMaxHeight().background(
-                                color = if (form > 90.0) green1
-                                else if (form > 80.0) green2
-                                else if (form > 70.0) green3
-                                else if (form > 60.0) green4
-                                else if (form > 50.0) green5
-                                else if (form > 40.0) Color.Gray
-                                else Color.Red,
-                                shape = MaterialTheme.shapes.medium
-                            ).padding(LocalSpacing.current.extraSmall),
+                            modifier = Modifier
+                                .fillMaxHeight()
+                                .background(
+                                    color = when (thisForm in 0..100) {
+                                        (thisForm in 60..100) -> if (isSystemInDarkTheme()) green50 else green40
+                                        (thisForm in 30..59) -> if (isSystemInDarkTheme()) Grey40 else Grey40
+                                        else -> if (isSystemInDarkTheme()) Red40 else Red60
+                                    },
+                                    shape = MaterialTheme.shapes.medium
+                                )
+                                .padding(LocalSpacing.current.extraSmall),
                             contentAlignment = Alignment.Center
                         ) {
-                            FormGuideRemarksText(text = "${form.toString().take(5)}%")
+                            Text(
+                                text = "${form.toString().take(5)}%",
+                                fontWeight= FontWeight.SemiBold,
+                                color = when (thisForm in 0..100) {
+                                    (thisForm in 60..100) -> green90
+                                    (thisForm in 30..59) -> Grey90
+                                    else -> Red90
+                                },
+                                style = MaterialTheme.typography.bodyMedium,
+                                textAlign = TextAlign.Center
+                            )
                         }
 
                     }

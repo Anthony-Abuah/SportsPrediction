@@ -15,6 +15,7 @@ import com.example.sportsprediction.core.util.UIEvent
 import com.example.sportsprediction.feature_app.data.local.entities.events.EventsEntity
 import com.example.sportsprediction.feature_app.data.local.entities.team_event.TeamEventEntity
 import com.example.sportsprediction.feature_app.domain.repository.TeamEventRepository
+import com.example.sportsprediction.feature_app.ui.presentation.view_model.states.FormPercentageState
 import com.example.sportsprediction.feature_app.ui.presentation.view_model.states.GetTeamsPastEventsState
 import com.example.sportsprediction.feature_app.ui.presentation.view_model.states.ShowTeamsPastEventsState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -52,6 +53,12 @@ class TeamNameEventsViewModel @Inject constructor(
     private var _showTeamPastEventsMessages = mutableStateOf(ShowTeamsPastEventsState())
     val showTeamPastEventsMessages: State<ShowTeamsPastEventsState> = _showTeamPastEventsMessages
 
+    private var _homeTeamFormPercentage = mutableStateOf(FormPercentageState())
+    val homeTeamFormPercentage : State<FormPercentageState> = _homeTeamFormPercentage
+
+    private var _awayTeamFormPercentage = mutableStateOf(FormPercentageState())
+    val awayTeamFormPercentage : State<FormPercentageState> = _awayTeamFormPercentage
+
 
     private var _listOfTeamNameEvents = listOf<TeamEventEntity>()
     val listOfTeamNameEvents: List<TeamEventEntity> = _listOfTeamNameEvents
@@ -67,12 +74,6 @@ class TeamNameEventsViewModel @Inject constructor(
         private set
 
     var homeFormPercentage by mutableStateOf(0.0)
-        private set
-
-    var selectedEvents by mutableStateOf(emptyList<EventsEntity>())
-        private set
-
-    var selectedDate by mutableStateOf(Date())
         private set
 
     var awayFormPercentage by mutableStateOf(0.0)
@@ -228,7 +229,6 @@ class TeamNameEventsViewModel @Inject constructor(
                 }
             }
         }.launchIn(this)
-
     }
 
     fun getHeadToHeadEvents(teamId: Int, headToHeadEventId: String) = viewModelScope.launch {
@@ -240,11 +240,55 @@ class TeamNameEventsViewModel @Inject constructor(
     }
 
     fun getHomeTeamFormPercentage(teamId: Int) = viewModelScope.launch {
-        homeFormPercentage = teamNameEventRepository.getTeamFormPercentage(teamId)
+        teamNameEventRepository.getTeamFormPercentage(teamId).onEach { response->
+            when(response){
+                is Resource.Success ->{
+                    _homeTeamFormPercentage.value = homeTeamFormPercentage.value.copy(
+                        formPercentage = response.data ?: 0.0,
+                        isLoading = false
+                    )
+                }
+                is Resource.Loading ->{
+                    _homeTeamFormPercentage.value = homeTeamFormPercentage.value.copy(
+                        formPercentage = response.data ?: 0.0,
+                        isLoading = true
+                    )
+                }
+                is Resource.Error ->{
+                    _homeTeamFormPercentage.value = homeTeamFormPercentage.value.copy(
+                        formPercentage = response.data ?: 0.0,
+                        isLoading = false
+                    )
+                }
+            }
+        }.launchIn(this)
+
     }
 
     fun getAwayTeamFormPercentage(teamId: Int) = viewModelScope.launch {
-        awayFormPercentage = teamNameEventRepository.getTeamFormPercentage(teamId)
+        teamNameEventRepository.getTeamFormPercentage(teamId).onEach { response->
+            when(response){
+                is Resource.Success ->{
+                    _awayTeamFormPercentage.value = awayTeamFormPercentage.value.copy(
+                        formPercentage = response.data ?: 0.0,
+                        isLoading = false
+                    )
+                }
+                is Resource.Loading ->{
+                    _awayTeamFormPercentage.value = awayTeamFormPercentage.value.copy(
+                        formPercentage = response.data ?: 0.0,
+                        isLoading = true
+                    )
+                }
+                is Resource.Error ->{
+                    _awayTeamFormPercentage.value = awayTeamFormPercentage.value.copy(
+                        formPercentage = response.data ?: 0.0,
+                        isLoading = false
+                    )
+                }
+            }
+        }.launchIn(this)
+
     }
 
     fun getTeamNameEventEntity(eventId: Int, teamId: Int) = viewModelScope.launch {

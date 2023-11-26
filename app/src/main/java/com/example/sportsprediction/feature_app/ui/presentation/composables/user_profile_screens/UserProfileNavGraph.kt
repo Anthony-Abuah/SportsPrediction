@@ -2,12 +2,9 @@ package com.example.sportsprediction.feature_app.ui.presentation.composables.use
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
-import com.example.sportsprediction.core.util.Constants.emptyString
 import com.example.sportsprediction.feature_app.ui.presentation.composables.bottom_nav.BottomNavScreens
 
 @Composable
@@ -21,40 +18,41 @@ fun UserProfilesNavGraph(
         startDestination = UserProfileScreens.RegisterUserScreen.route)
     {
         composable(route = UserProfileScreens.RegisterUserScreen.route){
-            RegisterUserScreen (
+            RegisterUserScreen(
                 navController = navHostController,
-                navigateBack = {navController.popBackStack()}
-            ) {username, password->
-                navController.navigate(UserProfileScreens.UserLoginScreen.withArgs(username,password))
+                navigateBack = { navController.popBackStack() },
+                navigateToCompleteProfileScreen = {
+                    navController.navigate(UserProfileScreens.CompleteProfileScreen.route)
+                }
+            ) {
+                navController.navigate(UserProfileScreens.UserLoginScreen.route)
             }
         }
-        composable(route = UserProfileScreens.UserLoginScreen.route + "/{username}/{password}",
-            arguments = listOf(
-                navArgument("username"){
-                    type = NavType.StringType
-                    defaultValue = emptyString
-                    nullable = true
-                },
-                navArgument("password"){
-                    type = NavType.StringType
-                    defaultValue = emptyString
-                    nullable = true
-                }
-            ),
-        ){entry ->
-            val username = entry.arguments?.getString("username")
-            val password = entry.arguments?.getString("password")
-            if (username != null) {
-                if (password != null) {
-                    UserLoginScreen (
-                        username = username,
-                        password = password,
+
+        composable(route = UserProfileScreens.UserProfileScreen.route){
+            UserProfileScreen(
+                navController = navHostController
+            ) { navController.popBackStack() }
+        }
+
+        composable(route = UserProfileScreens.CompleteProfileScreen.route
+        ){
+                    CompleteProfileScreen(
                         navController = navHostController,
-                        navigateBack = {navController.popBackStack()}
-                    ) {
-                        navHostController.navigate(BottomNavScreens.Events.route)
+                        navigateToHomePage = { navController.navigate(UserProfileScreens.UserProfileScreen.route) }) {
+                        navController.popBackStack()
                     }
-                }
+
+
+        }
+
+
+        composable(route = UserProfileScreens.UserLoginScreen.route ) {
+            UserLoginScreen (
+                navController = navHostController,
+                navigateBack = {navController.popBackStack()}
+            ) {
+                navHostController.navigate(BottomNavScreens.Events.route)
             }
         }
 

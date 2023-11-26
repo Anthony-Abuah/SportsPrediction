@@ -8,7 +8,7 @@ import java.util.*
 
 interface UserProfileRepository {
 
-    fun registerUser(user: UserEntity): Flow<Resource<String>>
+    fun insertUser(user: UserEntity): Flow<Resource<String>>
 
     fun loginUser(username: String, password: String): Flow<Resource<String>>
 

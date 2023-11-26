@@ -31,7 +31,7 @@ import com.example.sportsprediction.core.util.SuggestionVariables.Shots_Result
 import com.example.sportsprediction.core.util.SuggestionVariables.Yellow_Cards_Result
 import com.example.sportsprediction.feature_app.data.local.entities.event_stats.EventStatsEntity
 import com.example.sportsprediction.feature_app.ui.presentation.composables.components.BasicText
-import com.example.sportsprediction.feature_app.ui.presentation.composables.components.EventScoresInfoText
+import com.example.sportsprediction.feature_app.ui.presentation.composables.components.EventScoresTeamText
 import com.example.sportsprediction.feature_app.ui.theme.LocalSpacing
 import com.example.sportsprediction.feature_app.ui.theme.MainBackgroundColor
 
@@ -193,10 +193,9 @@ fun StatsContent(
                 val result =
                     if (homeValue > awayValue) "${eventStats.homeTeamName}" else if (homeValue < awayValue) "${eventStats.awayTeamName}" else "Draw"
                 BasicText(text = "$Result : ", fontSize = 16.sp, textColor = Color.Black)
-                EventScoresInfoText(
+                EventScoresTeamText(
                     text = result,
-                    fontWeight = FontWeight.Bold,
-                    textColor = Color.Black
+                    fontWeight = FontWeight.Bold
                 )
             }
 
@@ -225,10 +224,9 @@ fun StatsContent(
                 val result =
                     if (homeValue > awayValue) "${eventStats.homeTeamName}" else if (homeValue < awayValue) "${eventStats.awayTeamName}" else "Draw"
                 BasicText(text = "$Corner_Kicks : ", fontSize = 16.sp, textColor = Color.Black)
-                EventScoresInfoText(
+                EventScoresTeamText(
                     text = result,
-                    fontWeight = FontWeight.Bold,
-                    textColor = Color.Black
+                    fontWeight = FontWeight.Bold
                 )
             }
 
@@ -260,10 +258,9 @@ fun StatsContent(
                     fontSize = 16.sp,
                     textColor = Color.Black
                 )
-                EventScoresInfoText(
+                EventScoresTeamText(
                     text = result,
-                    fontWeight = FontWeight.Bold,
-                    textColor = Color.Black
+                    fontWeight = FontWeight.Bold
                 )
             }
 
@@ -291,10 +288,9 @@ fun StatsContent(
                 val result =
                     if (homeValue > awayValue) "${eventStats.homeTeamName}" else if (homeValue < awayValue) "${eventStats.awayTeamName}" else "Draw"
                 BasicText(text = "$Shots_Result : ", fontSize = 16.sp, textColor = Color.Black)
-                EventScoresInfoText(
+                EventScoresTeamText(
                     text = result,
-                    fontWeight = FontWeight.Bold,
-                    textColor = Color.Black
+                    fontWeight = FontWeight.Bold
                 )
             }
 
@@ -327,10 +323,9 @@ fun StatsContent(
                     fontSize = 16.sp,
                     textColor = Color.Black
                 )
-                EventScoresInfoText(
+                EventScoresTeamText(
                     text = result,
-                    fontWeight = FontWeight.Bold,
-                    textColor = Color.Black
+                    fontWeight = FontWeight.Bold
                 )
             }
 
@@ -358,10 +353,9 @@ fun StatsContent(
                 val result =
                     if (homeValue > awayValue) "${eventStats.homeTeamName}" else if (homeValue < awayValue) "${eventStats.awayTeamName}" else "Draw"
                 BasicText(text = "$Offsides_Result : ", fontSize = 16.sp, textColor = Color.Black)
-                EventScoresInfoText(
+                EventScoresTeamText(
                     text = result,
-                    fontWeight = FontWeight.Bold,
-                    textColor = Color.Black
+                    fontWeight = FontWeight.Bold
                 )
             }
 
@@ -393,10 +387,9 @@ fun StatsContent(
                     fontSize = 16.sp,
                     textColor = Color.Black
                 )
-                EventScoresInfoText(
+                EventScoresTeamText(
                     text = result,
-                    fontWeight = FontWeight.Bold,
-                    textColor = Color.Black
+                    fontWeight = FontWeight.Bold
                 )
             }
 

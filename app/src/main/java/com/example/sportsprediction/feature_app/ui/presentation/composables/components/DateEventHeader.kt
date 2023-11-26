@@ -2,16 +2,14 @@ package com.example.sportsprediction.feature_app.ui.presentation.composables.com
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.sportsprediction.R
@@ -26,16 +24,17 @@ fun DateEventHeader(
     openSearchCard: () -> Unit,
     navigateToUserPreferences: () -> Unit,
 ){
+    val iconTintColor = MaterialTheme.colorScheme.onBackground
     Card(
         shape = RectangleShape,
         colors = CardDefaults.cardColors(
-            contentColor = Color.White,
-            containerColor = PrimaryThemeColor
+            contentColor = MaterialTheme.colorScheme.onBackground,
+            containerColor = MaterialTheme.colorScheme.background
         ),
         modifier = Modifier
             .fillMaxWidth()
-            .requiredHeight(LocalSpacing.current.topAppBarSize),
-        elevation = CardDefaults.cardElevation(defaultElevation = 5.dp)
+            .height(LocalSpacing.current.topAppBarSize),
+        elevation = CardDefaults.cardElevation(defaultElevation = LocalSpacing.current.noElevation)
     ) {
         Row(modifier = Modifier.fillMaxSize(),
             verticalAlignment = Alignment.CenterVertically,
@@ -51,7 +50,7 @@ fun DateEventHeader(
                     contentAlignment = Alignment.Center){
                     Icon(
                         painter = painterResource(id = R.drawable.football),
-                        tint = Color.White,
+                        tint = iconTintColor,
                         modifier = Modifier
                             .fillMaxHeight()
                             .padding(LocalSpacing.current.extraSmall),
@@ -60,7 +59,7 @@ fun DateEventHeader(
                 }
 
                 Box(modifier = Modifier.padding(LocalSpacing.current.extraSmall), contentAlignment = Alignment.Center){
-                    TopAppBarText(text = Soccer, fontSize = 20.sp, textColor = Color.White)
+                    Text(text = Soccer, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
                 }
             }
 
@@ -74,7 +73,9 @@ fun DateEventHeader(
                         .padding(LocalSpacing.current.extraSmall)
                         .background(Color.Transparent),
                     onClick = openFilterCard) {
-                    Icon(painter = painterResource(id = R.drawable.filter), contentDescription = emptyString)
+                    Icon(painter = painterResource(id = R.drawable.filter),
+                        tint = iconTintColor,
+                        contentDescription = emptyString)
                 }
 
                 IconButton(
@@ -82,7 +83,9 @@ fun DateEventHeader(
                         .padding(LocalSpacing.current.extraSmall)
                         .background(Color.Transparent),
                     onClick = openSearchCard) {
-                    Icon(painter = painterResource(id = R.drawable.search), contentDescription = emptyString)
+                    Icon(painter = painterResource(id = R.drawable.search),
+                        tint = iconTintColor,
+                        contentDescription = emptyString)
                 }
 
                 IconButton(
@@ -91,7 +94,9 @@ fun DateEventHeader(
                         .background(Color.Transparent),
                     onClick = navigateToUserPreferences
                 ) {
-                    Icon(painter = painterResource(id = R.drawable.app_settings), contentDescription = emptyString)
+                    Icon(painter = painterResource(id = R.drawable.app_settings),
+                        tint = iconTintColor,
+                        contentDescription = emptyString)
                 }
             }
 

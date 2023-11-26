@@ -8,16 +8,18 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import com.example.sportsprediction.core.util.Constants.Away
 import com.example.sportsprediction.core.util.Constants.Home
 import com.example.sportsprediction.core.util.Constants.emptyString
 import com.example.sportsprediction.feature_app.ui.theme.LocalSpacing
-import com.example.sportsprediction.feature_app.ui.theme.PrimaryThemeColor
 import java.util.*
 
 @Composable
@@ -38,19 +40,20 @@ fun BetSlipCard(
 
     Row(modifier = Modifier
         .fillMaxWidth()
-        .wrapContentHeight(),
+        .wrapContentHeight()
+        .background(MaterialTheme.colorScheme.background),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center
     ){
         Box(modifier = Modifier
-            .weight(1f)
             .padding(LocalSpacing.current.small),
-        contentAlignment = Alignment.Center){
+        contentAlignment = Alignment.Center
+        ){
             Icon(
                 modifier = Modifier
                     .height(LocalSpacing.current.medium)
                     .width(LocalSpacing.current.medium)
-                    .background(Color.Red, shape = CircleShape)
+                    .background(MaterialTheme.colorScheme.errorContainer, shape = CircleShape)
                     .clickable {
                         removeBet()
                         closeBetSlip()
@@ -58,13 +61,12 @@ fun BetSlipCard(
                     },
                 imageVector = Icons.Default.Close,
                 contentDescription = emptyString,
-                tint = Color.White
+                tint = MaterialTheme.colorScheme.onErrorContainer
             )
         }
 
         Column(modifier = Modifier
-            .weight(9f)
-            .padding(LocalSpacing.current.extraSmall),
+            .padding(LocalSpacing.current.small),
             horizontalAlignment = Alignment.Start,
             verticalArrangement = Arrangement.Center
         ) {
@@ -72,37 +74,37 @@ fun BetSlipCard(
                 .fillMaxWidth()
                 .padding(LocalSpacing.current.extraSmall),
                 horizontalArrangement = Arrangement.Start,
-                verticalAlignment = Alignment.CenterVertically){
-                Box(modifier = Modifier, contentAlignment = Alignment.Center){
-                    BetSlipTeamText(text = marketName)
-                }
-            }
-            Row(modifier = Modifier
-                .fillMaxWidth()
-                .padding(LocalSpacing.current.extraSmall),
-                horizontalArrangement = Arrangement.Start,
-                verticalAlignment = Alignment.CenterVertically){
-                Box(modifier = Modifier, contentAlignment = Alignment.Center){
-                    BetSlipSuggestionText(text = "$homeTeam vs $awayTeam")
-                }
-            }
-            Row(modifier = Modifier
-                .fillMaxWidth()
-                .padding(LocalSpacing.current.extraSmall),
-                horizontalArrangement = Arrangement.Start,
-                verticalAlignment = Alignment.CenterVertically){
-                Box(modifier = Modifier, contentAlignment = Alignment.Center){
-                    Icon(modifier = Modifier
-                            .width(LocalSpacing.current.medium)
-                            .height(LocalSpacing.current.medium),
-                        imageVector = Icons.Default.Star,
-                        contentDescription = mainTeamName,
-                        tint = PrimaryThemeColor
+                verticalAlignment = Alignment.CenterVertically
+            ){
+                Box(modifier = Modifier, contentAlignment = Alignment.Center
+                ){
+                    Text(
+                        text = marketName,
+                        fontWeight= FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        style = MaterialTheme.typography.bodyMedium,
+                        textAlign = TextAlign.Start,
+                        overflow = TextOverflow.Ellipsis
                     )
                 }
-                Spacer(modifier = Modifier.width(LocalSpacing.current.small))
+            }
+
+            Row(modifier = Modifier
+                .fillMaxWidth()
+                .padding(LocalSpacing.current.extraSmall),
+                horizontalArrangement = Arrangement.Start,
+                verticalAlignment = Alignment.CenterVertically
+            ){
                 Box(modifier = Modifier, contentAlignment = Alignment.Center){
-                    BetSlipSuggestionText(text = mainTeamName)
+                    Text(
+                        text = "$homeTeam vs $awayTeam",
+                        fontWeight= FontWeight.Normal,
+                        color = MaterialTheme.colorScheme.onBackground,
+                        style = MaterialTheme.typography.bodySmall,
+                        textAlign = TextAlign.Start,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    //BetSlipSuggestionText(text = "$homeTeam vs $awayTeam")
                 }
             }
 
@@ -119,8 +121,6 @@ fun BetSlipCard(
                     BetSlipLightStreakText(text = " matches")
                 }
             }
-
-
 
         }
 
