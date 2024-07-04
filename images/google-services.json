@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "329299843179",
+    "project_id": "betpredictor-35336",
+    "storage_bucket": "betpredictor-35336.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:329299843179:android:3ac01866eb4be87a5ff92e",
+        "android_client_info": {
+          "package_name": "com.example.sportsprediction"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "329299843179-0igvu82to8tji20iqglq13gm4robmcem.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.sportsprediction",
+            "certificate_hash": "e44f92b431ffb094bb6f6bfd4e78a53118833071"
+          }
+        },
+        {
+          "client_id": "329299843179-p2oq7ljp8uu0qugcgreduhll342e6o62.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCPe0T55PwI6OI5bvdRINI31wawLabNzOA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "329299843179-p2oq7ljp8uu0qugcgreduhll342e6o62.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
